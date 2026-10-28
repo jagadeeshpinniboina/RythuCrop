@@ -15,6 +15,10 @@ def run_comprehensive_test_suite():
     print("=" * 80)
 
     client = app.test_client()
+    with client.session_transaction() as sess:
+        sess["is_authenticated"] = True
+        sess["mobile"] = "+919876543210"
+        sess["user_id"] = "+919876543210"
     passed_tests = 0
     total_tests = 0
 

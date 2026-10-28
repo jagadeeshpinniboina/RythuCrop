@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RythuCrop — Farmer Login & Authentication</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Telugu:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans+Kannada:wght@400;600;700&family=Noto+Sans+Malayalam:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&family=Noto+Sans+Oriya:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #15803d;
+            --primary-dark: #14532d;
+            --primary-light: #dcfce7;
+            --primary-hover: #166534;
+            --amber: #f59e0b;
+            --amber-dark: #b45309;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --bg-page: #f0fdf4;
+            --card-border: #e2e8f0;
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #fef3c7 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        /* Top Language Selector */
+        .top-bar {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lang-select {
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-weight: 600;
+            font-size: 0.88rem;
+            background: #ffffff;
+            cursor: pointer;
+            color: #1e293b;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .lang-select:focus {
+            border-color: var(--primary);
+        }
+
+        /* Main Container */
+        .auth-card {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px -15px rgba(20, 83, 45, 0.12), 0 0 1px 1px rgba(0,0,0,0.04);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            width: 100%;
+            max-width: 460px;
+            padding: 2.5rem 2.25rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #15803d, #22c55e, #f59e0b);
+        }
+
+        /* Branding */
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.75rem;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            font-size: 2.2rem;
+            line-height: 1;
+        }
+
+        .brand-name {
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            letter-spacing: -0.5px;
+        }
+
+        .brand-tagline {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            font-weight: 500;
+            margin-bottom: 1.75rem;
+        }
+
+        /* Step Card Titles */
+        .card-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-desc {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 1.75rem;
+        }
+
+        /* Step 1: Mobile Form */
+        .input-group {
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .phone-wrapper {
+            display: flex;
+            align-items: center;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            background: #ffffff;
+            transition: all 0.2s ease;
+            overflow: hidden;
+        }
+
+        .phone-wrapper:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(21, 128, 61, 0.12);
+        }
+
+        .country-prefix {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 14px;
+            background: #f8fafc;
+            border-right: 1px solid #cbd5e1;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #334155;
+            height: 52px;
+            user-select: none;
+        }
+
+        .flag-icon {
+            font-size: 1.25rem;
+        }
+
+        .phone-input {
+            flex: 1;
+            height: 52px;
+            border: none;
+            outline: none;
+            padding: 0 16px;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            letter-spacing: 0.5px;
+            background: transparent;
+        }
+
+        .phone-input::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        /* Validation indicator */
+        .valid-indicator {
+            font-size: 0.78rem;
+            margin-top: 6px;
+            font-weight: 600;
+            display: none;
+        }
+        .valid-indicator.error {
+            color: var(--danger);
+            display: block;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            width: 100%;
+            height: 52px;
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(21, 128, 61, 0.35);
+        }
+
+        .btn-primary:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Step 2: OTP Inputs */
+        .masked-phone-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f1f5f9;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 1.25rem;
+            border: 1px solid #cbd5e1;
+        }
+
+        .edit-number-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-left: 6px;
+        }
+
+        .otp-boxes-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .otp-box {
+            width: 52px;
+            height: 58px;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            background: #ffffff;
+            outline: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .otp-box:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(21, 128, 61, 0.15);
+            background: #f0fdf4;
+            transform: scale(1.04);
+        }
+
+        .otp-box.filled {
+            border-color: #86efac;
+            background: #f8fafc;
+        }
+
+        /* Resend & Cooldown */
+        .resend-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            margin-bottom: 1.5rem;
+            padding: 0 4px;
+        }
+
+        .countdown-text {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .countdown-timer {
+            font-weight: 800;
+            color: var(--amber-dark);
+        }
+
+        .btn-resend {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 0;
+            transition: color 0.2s;
+        }
+
+        .btn-resend:disabled {
+            color: #94a3b8;
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+
+        /* Alerts & Toasts */
+        .alert-box {
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            text-align: left;
+            display: none;
+            line-height: 1.4;
+        }
+
+        .alert-danger {
+            background: var(--danger-light);
+            color: var(--danger);
+            border: 1px solid #fca5a5;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        /* Dev Mock Mode Banner */
+        .dev-mock-toast {
+            background: #fffbeb;
+            border: 1px dashed var(--amber);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 1.25rem;
+            font-size: 0.85rem;
+            color: #92400e;
+            text-align: left;
+            display: none;
+        }
+
+        .dev-mock-toast strong {
+            color: #78350f;
+        }
+
+        .btn-quickfill {
+            margin-top: 8px;
+            display: inline-block;
+            background: var(--amber);
+            color: #ffffff;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-quickfill:hover {
+            background: var(--amber-dark);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #ffffff;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Footer Guarantee */
+        .security-badge {
+            margin-top: 2rem;
+            font-size: 0.78rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 2rem 1.25rem;
+            }
+            .otp-box {
+                width: 42px;
+                height: 50px;
+                font-size: 1.35rem;
+            }
+            .top-bar {
+                top: 0.75rem;
+                right: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Language Selector Dropdown -->
+    <div class="top-bar">
+        <select id="loginLangSelect" class="lang-select" onchange="onLanguageChange(this.value)">
+            <option value="en">English</option>
+            <option value="te">తెలుగు (Telugu)</option>
+            <option value="hi">हिन्दी (Hindi)</option>
+            <option value="ta">தமிழ் (Tamil)</option>
+            <option value="kn">ಕನ್ನಡ (Kannada)</option>
+            <option value="ml">മലയാളം (Malayalam)</option>
+            <option value="mr">मराठी (Marathi)</option>
+            <option value="bn">বাংলা (Bengali)</option>
+            <option value="od">ଓଡ଼ିଆ (Odia)</option>
+        </select>
+    </div>
+
+    <!-- Main Card -->
+    <div class="auth-card">
+        <!-- Branding -->
+        <div class="brand-badge">
+            <span class="brand-icon">🌱</span>
+            <span class="brand-name">RythuCrop</span>
+        </div>
+        <p class="brand-tagline" id="txtTagline">AI-Powered Smart Agriculture Decision Platform</p>
+
+        <!-- STEP 1: Mobile Number Input -->
+        <div id="stepMobile" style="display: block;">
+            <h2 class="card-title" id="txtMobileTitle">Farmer Sign In</h2>
+            <p class="card-desc" id="txtMobileDesc">Enter your 10-digit mobile number to receive a secure 6-digit OTP.</p>
+
+            <div id="mobileError" class="alert-box alert-danger"></div>
+
+            <form id="mobileForm" onsubmit="handleSendOTP(event)">
+                <div class="input-group">
+                    <label class="input-label" for="mobileInput" id="txtMobileLabel">Mobile Number</label>
+                    <div class="phone-wrapper">
+                        <div class="country-prefix">
+                            <span class="flag-icon">🇮🇳</span>
+                            <span>+91</span>
+                        </div>
+                        <input
+                            type="tel"
+                            id="mobileInput"
+                            class="phone-input"
+                            maxlength="10"
+                            placeholder="98765 43210"
+                            pattern="[6-9][0-9]{9}"
+                            inputmode="numeric"
+                            autocomplete="tel-national"
+                            required
+                            autofocus
+                            oninput="validateMobileInput(this)"
+                        >
+                    </div>
+                    <div id="mobileValidationMsg" class="valid-indicator">Please enter a valid 10-digit number starting with 6, 7, 8, or 9.</div>
+                </div>
+
+                <button type="submit" id="btnSendOTP" class="btn-primary">
+                    <span id="btnSendText">Send OTP</span>
+                    <span id="btnSendSpinner" class="spinner" style="display: none;"></span>
+                </button>
+            </form>
+        </div>
+
+        <!-- STEP 2: 6-Digit OTP Verification Screen -->
+        <div id="stepOTP" style="display: none;">
+            <h2 class="card-title" id="txtOtpTitle">Enter Verification Code</h2>
+
+            <div class="masked-phone-badge">
+                <span>📱</span>
+                <span id="txtMaskedNotice">Enter the 6-digit OTP sent to <strong id="displayMaskedPhone">XXXXXX8801</strong></span>
+                <button type="button" class="edit-number-btn" onclick="backToStepMobile()" title="Change mobile number">Change</button>
+            </div>
+
+            <!-- Development Mock Mode Toast Banner -->
+            <div id="devMockBanner" class="dev-mock-toast">
+                <div>⚙️ <strong>Development Mock Mode Active</strong></div>
+                <div id="devMockDetails" style="margin-top: 4px;">Console logged test OTP: <strong id="devOtpCode">123456</strong></div>
+                <button type="button" class="btn-quickfill" onclick="quickFillDevOTP()">⚡ Quick Fill Test OTP</button>
+            </div>
+
+            <div id="otpError" class="alert-box alert-danger"></div>
+            <div id="otpSuccess" class="alert-box alert-success"></div>
+
+            <form id="otpForm" onsubmit="handleVerifyOTP(event)">
+                <div class="otp-boxes-container" id="otpBoxes">
+                    <input type="text" class="otp-box" maxlength="1" inputmode="numeric" data-index="0" autocomplete="one-time-code" required>
+                    <input type="text" class="otp-box" maxlength="1" inputmode="numeric" data-index="1" autocomplete="one-time-code" required>
+                    <input type="text" class="otp-box" maxlength="1" inputmode="numeric" data-index="2" autocomplete="one-time-code" required>
+                    <input type="text" class="otp-box" maxlength="1" inputmode="numeric" data-index="3" autocomplete="one-time-code" required>
+                    <input type="text" class="otp-box" maxlength="1" inputmode="numeric" data-index="4" autocomplete="one-time-code" required>
+                    <input type="text" class="otp-box" maxlength="1" inputmode="numeric" data-index="5" autocomplete="one-time-code" required>
+                </div>
+
+                <div class="resend-section">
+                    <span class="countdown-text" id="countdownContainer">
+                        Resend in <span id="timerCountdown" class="countdown-timer">30</span>s
+                    </span>
+                    <button type="button" id="btnResendOTP" class="btn-resend" onclick="handleResendOTP()" disabled>
+                        Resend OTP
+                    </button>
+                </div>
+
+                <button type="submit" id="btnVerifyOTP" class="btn-primary">
+                    <span id="btnVerifyText">Verify & Enter Dashboard</span>
+                    <span id="btnVerifySpinner" class="spinner" style="display: none;"></span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Security / Farmer Trust Badge -->
+        <div class="security-badge">
+            <span>🔒</span>
+            <span id="txtSecureMsg">Government & ICAR verified agricultural data portal</span>
+        </div>
+    </div>
+
+    <script>
+        // Multi-Language Strings for Login Screen
+        const I18N = {
+            en: {
+                tagline: "AI-Powered Smart Agriculture Decision Platform",
+                mobileTitle: "Farmer Sign In",
+                mobileDesc: "Enter your 10-digit mobile number to receive a secure 6-digit OTP.",
+                mobileLabel: "Mobile Number",
+                sendOTP: "Send OTP",
+                otpTitle: "Enter Verification Code",
+                sentTo: "Enter the 6-digit OTP sent to",
+                changeNum: "Change",
+                verifyBtn: "Verify & Enter Dashboard",
+                resendIn: "Resend in",
+                resendBtn: "Resend OTP",
+                secure: "Government & ICAR verified agricultural data portal",
+                invalidPhone: "Please enter a valid 10-digit number starting with 6, 7, 8, or 9.",
+                fillAllDigits: "Please enter all 6 digits of the OTP code.",
+                cooldownMsg: "Please wait before requesting a new OTP."
+            },
+            te: {
+                tagline: "రైతుల కోసం ఏఐ ఆధారిత వ్యవసాయ నిర్ణయ వేదిక",
+                mobileTitle: "రైతు లాగిన్",
+                mobileDesc: "మీ 10 అంకెల మొబైల్ నంబరును నమోదు చేసి 6 అంకెల ఓటీపీని పొందండి.",
+                mobileLabel: "మొబైల్ నంబర్",
+                sendOTP: "ఓటీపీ పంపండి",
+                otpTitle: "ధృవీకరణ కోడ్ నమోదు చేయండి",
+                sentTo: "ఈ నంబర్‌కు పంపిన 6 అంకెల ఓటీపీని నమోదు చేయండి",
+                changeNum: "మార్చు",
+                verifyBtn: "ధృవీకరించి లాగిన్ అవ్వండి",
+                resendIn: "మళ్ళీ పంపడానికి సమయం",
+                resendBtn: "ఓటీపీ మళ్ళీ పంపండి",
+                secure: "ప్రభుత్వ మరియు ICAR ధృవీకృత వ్యవసాయ వేదిక",
+                invalidPhone: "దయచేసి 6, 7, 8 లేదా 9 తో మొదలయ్యే 10 అంకెల నంబరును నమోదు చేయండి.",
+                fillAllDigits: "దయచేసి మొత్తం 6 అంకెల ఓటీపీని నమోదు చేయండి.",
+                cooldownMsg: "దయచేసి కొత్త ఓటీపీ కోరేముందు వేచి ఉండండి."
+            },
+            hi: {
+                tagline: "एआई-संचालित स्मार्ट कृषि निर्णय मंच",
+                mobileTitle: "किसान लॉगिन",
+                mobileDesc: "6 अंकों का सुरक्षित ओटीपी प्राप्त करने के लिए अपना 10 अंकों का मोबाइल नंबर दर्ज करें।",
+                mobileLabel: "मोबाइल नंबर",
+                sendOTP: "ओटीपी भेजें",
+                otpTitle: "सत्यापन कोड दर्ज करें",
+                sentTo: "इस नंबर पर भेजा गया 6 अंकों का ओटीपी दर्ज करें",
+                changeNum: "बदलें",
+                verifyBtn: "सत्यापित करें और प्रवेश करें",
+                resendIn: "पुनः भेजने में समय",
+                resendBtn: "ओटीपी पुनः भेजें",
+                secure: "सरकारी एवं आईसीएआर सत्यापित कृषि डेटा पोर्टल",
+                invalidPhone: "कृपया 6, 7, 8 या 9 से शुरू होने वाला 10 अंकों का वैध नंबर दर्ज करें।",
+                fillAllDigits: "कृपया 6 अंकों का पूरा ओटीपी कोड दर्ज करें।",
+                cooldownMsg: "कृपया नया ओटीपी अनुरोध करने से पहले प्रतीक्षा करें।"
+            },
+            ta: {
+                tagline: "விவசாயிகளுக்கான செயற்கை நுண்ணறிவு மேடை",
+                mobileTitle: "விவசாயி உள்நுழைவு",
+                mobileDesc: "6 இலக்க கடவுச்சொல்லைப் பெற 10 இலக்க மொபைல் எண்ணை உள்ளிடவும்.",
+                mobileLabel: "மொபைல் எண்",
+                sendOTP: "OTP அனுப்புக",
+                otpTitle: "சரிபார்ப்புக் குறியீட்டை உள்ளிடவும்",
+                sentTo: "அனுப்பப்பட்ட 6 இலக்க OTP ஐ உள்ளிடவும்",
+                changeNum: "மாற்று",
+                verifyBtn: "சரிபார்த்து உள்நுழையவும்",
+                resendIn: "மீண்டும் அனுப்ப நேரம்",
+                resendBtn: "OTP மீண்டும் அனுப்பு",
+                secure: "அரசு மற்றும் ICAR சரிபார்க்கப்பட்ட வேளாண் தளம்",
+                invalidPhone: "6, 7, 8 அல்லது 9 இல் தொடங்கும் 10 இலக்க எண்ணை உள்ளிடவும்.",
+                fillAllDigits: "அனைத்து 6 இலக்கங்களையும் உள்ளிடவும்.",
+                cooldownMsg: "தயவுசெய்து காத்திருக்கவும்."
+            },
+            kn: {
+                tagline: "ರೈತರಿಗಾಗಿ ಎಐ ಚಾಲಿತ ಸ್ಮಾರ್ಟ್ ಕೃಷಿ ವೇದಿಕೆ",
+                mobileTitle: "ರೈತರ ಲಾಗಿನ್",
+                mobileDesc: "6-ಅಂಕಿಯ ಒಟಿಪಿ ಪಡೆಯಲು ನಿಮ್ಮ 10-ಅಂಕಿಯ ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ.",
+                mobileLabel: "ಮೊಬೈಲ್ ಸಂಖ್ಯೆ",
+                sendOTP: "ಒಟಿಪಿ ಕಳುಹಿಸಿ",
+                otpTitle: "ದೃಢೀಕರಣ ಕೋಡ್ ನಮೂದಿಸಿ",
+                sentTo: "ಕಳುಹಿಸಲಾದ 6-ಅಂಕಿಯ ಒಟಿಪಿ ನಮೂದಿಸಿ",
+                changeNum: "ಬದಲಾಯಿಸಿ",
+                verifyBtn: "ದೃಢೀಕರಿಸಿ ಮತ್ತು ಮುಂದುವರಿಯಿರಿ",
+                resendIn: "ಮತ್ತೆ ಕಳುಹಿಸಲು ಸಮಯ",
+                resendBtn: "ಒಟಿಪಿ ಪುನಃ ಕಳುಹಿಸಿ",
+                secure: "ಸರ್ಕಾರಿ ಮತ್ತು ICAR ಪರಿಶೀಲಿತ ಕೃಷಿ ಪೋರ್ಟಲ್",
+                invalidPhone: "ದಯವಿಟ್ಟು ಮಾನ್ಯ 10-ಅಂಕಿಯ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ.",
+                fillAllDigits: "ದಯವಿಟ್ಟು ಎಲ್ಲಾ 6 ಅಂಕಿಗಳನ್ನು ನಮೂದಿಸಿ.",
+                cooldownMsg: "ದಯವಿಟ್ಟು ಕಾಯಿರಿ."
+            },
+            ml: {
+                tagline: "കർഷകർക്കായി AI അധിഷ്ഠിത കാർഷിക പ്ലാറ്റ്ഫോം",
+                mobileTitle: "കർഷക ലോഗിൻ",
+                mobileDesc: "സുരക്ഷിതമായ 6 അക്ക ഒടിപി ലഭിക്കാൻ 10 അക്ക മൊബൈൽ നമ്പർ നൽകുക.",
+                mobileLabel: "മൊബൈൽ നമ്പർ",
+                sendOTP: "ഒടിപി അയക്കുക",
+                otpTitle: "സ്ഥിരീകരണ കോഡ് നൽകുക",
+                sentTo: "അയച്ച 6 അക്ക ഒടിപി നൽകുക",
+                changeNum: "മാറ്റുക",
+                verifyBtn: "സ്ഥിരീകരിച്ച് തുടരുക",
+                resendIn: "വീണ്ടും അയക്കാൻ",
+                resendBtn: "ഒടിപി വീണ്ടും അയക്കുക",
+                secure: "സർക്കാർ & ICAR അംഗീകൃത കാർഷിക പോർട്ടൽ",
+                invalidPhone: "സാധുവായ 10 അക്ക നമ്പർ നൽകുക.",
+                fillAllDigits: "എല്ലാ 6 അക്കങ്ങളും നൽകുക.",
+                cooldownMsg: "ദയവായി കാത്തിരിക്കുക."
+            },
+            mr: {
+                tagline: "शेतकऱ्यांसाठी एआय-आधारित स्मार्ट कृषी मंच",
+                mobileTitle: "शेतकरी लॉगिन",
+                mobileDesc: "सुरक्षित 6-अंकी ओटीपी मिळवण्यासाठी आपला 10-अंकी मोबाइल क्रमांक प्रविष्ट करा.",
+                mobileLabel: "मोबाइल क्रमांक",
+                sendOTP: "ओटीपी पाठवा",
+                otpTitle: "पडताळणी कोड प्रविष्ट करा",
+                sentTo: "पाठवलेला 6-अंकी ओटीपी प्रविष्ट करा",
+                changeNum: "बदला",
+                verifyBtn: "सत्यापित करा आणि प्रवेश करा",
+                resendIn: "पुन्हा पाठवण्यासाठी वेळ",
+                resendBtn: "ओटीपी पुन्हा पाठवा",
+                secure: "शासकीय आणि आयसीएआर सत्यापित कृषी पोर्टल",
+                invalidPhone: "कृपया 10-अंकी वैध क्रमांक प्रविष्ट करा.",
+                fillAllDigits: "कृपया सर्व 6 अंक प्रविष्ट करा.",
+                cooldownMsg: "कृपया प्रतीक्षा करा."
+            },
+            bn: {
+                tagline: "কৃষকদের জন্য এআই-চালিত স্মার্ট কৃষি প্ল্যাটফর্ম",
+                mobileTitle: "কৃষক লগইন",
+                mobileDesc: "নিরাপদ ৬-সংখ্যার ওটিপি পেতে আপনার ১০-সংখ্যার মোবাইল নম্বর লিখুন।",
+                mobileLabel: "মোবাইল নম্বর",
+                sendOTP: "ওটিপি পাঠান",
+                otpTitle: "যাচাইকরণ কোড লিখুন",
+                sentTo: "পাঠানো ৬-সংখ্যার ওটিপি লিখুন",
+                changeNum: "পরিবর্তন",
+                verifyBtn: "যাচাই করে প্রবেশ করুন",
+                resendIn: "পুনরায় পাঠানোর সময়",
+                resendBtn: "ওটিপি পুনরায় পাঠান",
+                secure: "সরকারী ও আইসিএআর অনুমোদিত কৃষি পোর্টাল",
+                invalidPhone: "সঠিক ১০-সংখ্যার নম্বর লিখুন।",
+                fillAllDigits: "সমস্ত ৬টি সংখ্যা পূরণ করুন।",
+                cooldownMsg: "অনুগ্রহ করে অপেক্ষা করুন।"
+            },
+            od: {
+                tagline: "କୃଷକଙ୍କ ପାଇଁ ଏଆଇ-ଆଧାରିତ କୃଷି ମଞ୍ଚ",
+                mobileTitle: "କୃଷକ ଲଗଇନ୍",
+                mobileDesc: "୬-ଅଙ୍କିଆ ଓଟିପି ପାଇବା ପାଇଁ ଆପଣଙ୍କ ୧୦-ଅଙ୍କିଆ ମୋବାଇଲ ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ।",
+                mobileLabel: "ମୋବାଇଲ ନମ୍ବର",
+                sendOTP: "ଓଟିପି ପଠାନ୍ତୁ",
+                otpTitle: "ଯାଞ୍ଚ କୋଡ୍ ପ୍ରବେଶ କରନ୍ତୁ",
+                sentTo: "ପଠାଯାଇଥିବା ୬-ଅଙ୍କିଆ ଓଟିପି ପ୍ରବେଶ କରନ୍ତୁ",
+                changeNum: "ବଦଳାନ୍ତୁ",
+                verifyBtn: "ଯାଞ୍ଚ କରି ପ୍ରବେଶ କରନ୍ତୁ",
+                resendIn: "ପୁନଃ ପଠାଇବା ସମୟ",
+                resendBtn: "ଓଟିପି ପୁନଃ ପଠାନ୍ତୁ",
+                secure: "ସରକାରୀ ଏବଂ ICAR ଯାଞ୍ଚ କୃଷି ପୋର୍ଟାଲ",
+                invalidPhone: "ସଠିକ୍ ୧୦-ଅଙ୍କିଆ ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ।",
+                fillAllDigits: "ସମସ୍ତ ୬ଟି ଅଙ୍କ ପ୍ରବେଶ କରନ୍ତୁ।",
+                cooldownMsg: "ଦୟାକରି ଅପେକ୍ଷା କରନ୍ତୁ।"
+            }
+        };
+
+        // State
+        let currentLang = "en";
+        let activeMobile = "";
+        let countdownTimer = null;
+        let countdownSeconds = 30;
+        let lastDevOtp = "";
+
+        const nextParam = new URLSearchParams(window.location.search).get("next") || "/home";
+
+        function onLanguageChange(lang) {
+            currentLang = lang;
+            const t = I18N[lang] || I18N.en;
+
+            document.getElementById("txtTagline").textContent = t.tagline;
+            document.getElementById("txtMobileTitle").textContent = t.mobileTitle;
+            document.getElementById("txtMobileDesc").textContent = t.mobileDesc;
+            document.getElementById("txtMobileLabel").textContent = t.mobileLabel;
+            document.getElementById("btnSendText").textContent = t.sendOTP;
+            document.getElementById("txtOtpTitle").textContent = t.otpTitle;
+            document.getElementById("btnVerifyText").textContent = t.verifyBtn;
+            document.getElementById("btnResendOTP").textContent = t.resendBtn;
+            document.getElementById("txtSecureMsg").textContent = t.secure;
+            document.getElementById("mobileValidationMsg").textContent = t.invalidPhone;
+
+            // Update masked phone notice if present
+            const masked = document.getElementById("displayMaskedPhone").textContent;
+            document.getElementById("txtMaskedNotice").innerHTML = `${t.sentTo} <strong id="displayMaskedPhone">${masked}</strong>`;
+        }
+
+        function validateMobileInput(input) {
+            // Strip any non-digit
+            input.value = input.value.replace(/\D/g, "");
+            const val = input.value;
+            const indicator = document.getElementById("mobileValidationMsg");
+            if (val.length === 0) {
+                indicator.classList.remove("error");
+            } else if (!/^[6-9]\d{0,9}$/.test(val)) {
+                indicator.classList.add("error");
+            } else {
+                indicator.classList.remove("error");
+            }
+        }
+
+        async function handleSendOTP(e) {
+            e.preventDefault();
+            const mobileInput = document.getElementById("mobileInput");
+            const mobile = mobileInput.value.trim();
+            const errBox = document.getElementById("mobileError");
+            const btn = document.getElementById("btnSendOTP");
+            const spinner = document.getElementById("btnSendSpinner");
+            const btnText = document.getElementById("btnSendText");
+
+            errBox.style.display = "none";
+
+            // Strict Indian Mobile regex check: 10 digits starting with 6, 7, 8, 9
+            if (!/^[6-9]\d{9}$/.test(mobile)) {
+                errBox.textContent = (I18N[currentLang] || I18N.en).invalidPhone;
+                errBox.style.display = "block";
+                return;
+            }
+
+            // Show loading state
+            btn.disabled = true;
+            spinner.style.display = "inline-block";
+            btnText.style.opacity = "0.7";
+
+            try {
+                const res = await fetch("/auth/send-otp", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ mobile: mobile })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok || !data.success) {
+                    throw new Error(data.error || "Failed to send OTP. Please try again.");
+                }
+
+                activeMobile = mobile;
+
+                // Step 2 Transition
+                document.getElementById("stepMobile").style.display = "none";
+                document.getElementById("stepOTP").style.display = "block";
+
+                // Display masked phone showing ONLY last 4 digits
+                const masked = data.masked_mobile || `XXXXXX${mobile.slice(-4)}`;
+                document.getElementById("displayMaskedPhone").textContent = masked;
+                const t = I18N[currentLang] || I18N.en;
+                document.getElementById("txtMaskedNotice").innerHTML = `${t.sentTo} <strong id="displayMaskedPhone">${masked}</strong>`;
+
+                // Dev Mock Mode Handling
+                const devBanner = document.getElementById("devMockBanner");
+                if (data.dev_mode && data.dev_otp) {
+                    lastDevOtp = data.dev_otp;
+                    document.getElementById("devOtpCode").textContent = data.dev_otp;
+                    devBanner.style.display = "block";
+                } else {
+                    devBanner.style.display = "none";
+                }
+
+                // Start 30-Second Countdown Timer
+                startCountdown(data.cooldown_seconds || 30);
+
+                // Focus first OTP box
+                setupOtpInputHandlers();
+                const firstBox = document.querySelector(".otp-box[data-index='0']");
+                if (firstBox) firstBox.focus();
+
+            } catch (err) {
+                errBox.textContent = err.message;
+                errBox.style.display = "block";
+            } finally {
+                btn.disabled = false;
+                spinner.style.display = "none";
+                btnText.style.opacity = "1";
+            }
+        }
+
+        function backToStepMobile() {
+            clearInterval(countdownTimer);
+            document.getElementById("stepOTP").style.display = "none";
+            document.getElementById("stepMobile").style.display = "block";
+            document.getElementById("mobileError").style.display = "none";
+            document.getElementById("mobileInput").focus();
+        }
+
+        function startCountdown(seconds) {
+            clearInterval(countdownTimer);
+            countdownSeconds = seconds || 30;
+            const timerSpan = document.getElementById("timerCountdown");
+            const resendBtn = document.getElementById("btnResendOTP");
+            const countdownContainer = document.getElementById("countdownContainer");
+
+            resendBtn.disabled = true;
+            countdownContainer.style.display = "inline";
+            timerSpan.textContent = countdownSeconds;
+
+            countdownTimer = setInterval(() => {
+                countdownSeconds--;
+                if (countdownSeconds <= 0) {
+                    clearInterval(countdownTimer);
+                    countdownContainer.style.display = "none";
+                    resendBtn.disabled = false;
+                } else {
+                    timerSpan.textContent = countdownSeconds;
+                }
+            }, 1000);
+        }
+
+        async function handleResendOTP() {
+            const errBox = document.getElementById("otpError");
+            const succBox = document.getElementById("otpSuccess");
+            errBox.style.display = "none";
+            succBox.style.display = "none";
+
+            const resendBtn = document.getElementById("btnResendOTP");
+            resendBtn.disabled = true;
+
+            try {
+                const res = await fetch("/auth/send-otp", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ mobile: activeMobile })
+                });
+
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    throw new Error(data.error || "Unable to resend OTP.");
+                }
+
+                succBox.textContent = "New 6-digit OTP has been sent successfully.";
+                succBox.style.display = "block";
+
+                if (data.dev_mode && data.dev_otp) {
+                    lastDevOtp = data.dev_otp;
+                    document.getElementById("devOtpCode").textContent = data.dev_otp;
+                    document.getElementById("devMockBanner").style.display = "block";
+                }
+
+                // Restart 30s countdown
+                startCountdown(data.cooldown_seconds || 30);
+
+                // Clear input boxes
+                document.querySelectorAll(".otp-box").forEach(b => {
+                    b.value = "";
+                    b.classList.remove("filled");
+                });
+                const firstBox = document.querySelector(".otp-box[data-index='0']");
+                if (firstBox) firstBox.focus();
+
+            } catch (err) {
+                errBox.textContent = err.message;
+                errBox.style.display = "block";
+                resendBtn.disabled = false;
+            }
+        }
+
+        function quickFillDevOTP() {
+            if (!lastDevOtp || lastDevOtp.length !== 6) return;
+            const boxes = document.querySelectorAll(".otp-box");
+            for (let i = 0; i < 6; i++) {
+                if (boxes[i]) {
+                    boxes[i].value = lastDevOtp[i];
+                    boxes[i].classList.add("filled");
+                }
+            }
+            document.getElementById("btnVerifyOTP").focus();
+        }
+
+        function setupOtpInputHandlers() {
+            const boxes = document.querySelectorAll(".otp-box");
+
+            boxes.forEach((box, idx) => {
+                // Keydown for backspace navigation
+                box.onkeydown = (e) => {
+                    if (e.key === "Backspace") {
+                        if (!box.value && idx > 0) {
+                            boxes[idx - 1].focus();
+                            boxes[idx - 1].value = "";
+                            boxes[idx - 1].classList.remove("filled");
+                            e.preventDefault();
+                        } else {
+                            box.value = "";
+                            box.classList.remove("filled");
+                        }
+                    } else if (e.key === "ArrowLeft" && idx > 0) {
+                        boxes[idx - 1].focus();
+                    } else if (e.key === "ArrowRight" && idx < boxes.length - 1) {
+                        boxes[idx + 1].focus();
+                    }
+                };
+
+                // Input event for auto-tab
+                box.oninput = (e) => {
+                    const val = box.value.replace(/\D/g, "");
+                    box.value = val ? val[val.length - 1] : "";
+
+                    if (box.value) {
+                        box.classList.add("filled");
+                        if (idx < boxes.length - 1) {
+                            boxes[idx + 1].focus();
+                        } else {
+                            // Check if all filled, then auto submit or ready
+                            checkAndAutoSubmit();
+                        }
+                    } else {
+                        box.classList.remove("filled");
+                    }
+                };
+
+                // Paste handler
+                box.onpaste = (e) => {
+                    e.preventDefault();
+                    const text = (e.clipboardData || window.clipboardData).getData("text");
+                    const digits = text.replace(/\D/g, "").slice(0, 6);
+                    if (digits.length > 0) {
+                        for (let i = 0; i < digits.length; i++) {
+                            if (boxes[i]) {
+                                boxes[i].value = digits[i];
+                                boxes[i].classList.add("filled");
+                            }
+                        }
+                        const nextTarget = boxes[Math.min(digits.length, boxes.length - 1)];
+                        if (nextTarget) nextTarget.focus();
+                        if (digits.length === 6) {
+                            checkAndAutoSubmit();
+                        }
+                    }
+                };
+            });
+        }
+
+        function getEnteredOTP() {
+            let code = "";
+            document.querySelectorAll(".otp-box").forEach(b => {
+                code += b.value.trim();
+            });
+            return code;
+        }
+
+        function checkAndAutoSubmit() {
+            const code = getEnteredOTP();
+            if (code.length === 6) {
+                // Auto trigger verification after slight delay for visual confirmation
+                setTimeout(() => {
+                    document.getElementById("btnVerifyOTP").click();
+                }, 150);
+            }
+        }
+
+        async function handleVerifyOTP(e) {
+            e.preventDefault();
+            const otpCode = getEnteredOTP();
+            const errBox = document.getElementById("otpError");
+            const succBox = document.getElementById("otpSuccess");
+            const btn = document.getElementById("btnVerifyOTP");
+            const spinner = document.getElementById("btnVerifySpinner");
+            const btnText = document.getElementById("btnVerifyText");
+
+            errBox.style.display = "none";
+            succBox.style.display = "none";
+
+            if (otpCode.length !== 6) {
+                errBox.textContent = (I18N[currentLang] || I18N.en).fillAllDigits;
+                errBox.style.display = "block";
+                return;
+            }
+
+            btn.disabled = true;
+            spinner.style.display = "inline-block";
+            btnText.style.opacity = "0.7";
+
+            try {
+                const res = await fetch("/auth/verify-otp", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        mobile: activeMobile,
+                        otp: otpCode,
+                        preferred_lang: currentLang,
+                        next: nextParam
+                    })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok || !data.success) {
+                    throw new Error(data.error || "Verification failed. Please check the OTP code.");
+                }
+
+                succBox.textContent = "Verification successful! Redirecting to RythuCrop Portal...";
+                succBox.style.display = "block";
+
+                // Redirect to protected dashboard
+                setTimeout(() => {
+                    window.location.href = data.redirect || nextParam || "/home";
+                }, 400);
+
+            } catch (err) {
+                errBox.textContent = err.message;
+                errBox.style.display = "block";
+                btn.disabled = false;
+                spinner.style.display = "none";
+                btnText.style.opacity = "1";
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener("DOMContentLoaded", () => {
+            const savedLang = localStorage.getItem("rythu_lang") || "en";
+            const select = document.getElementById("loginLangSelect");
+            if (select) {
+                select.value = savedLang;
+                onLanguageChange(savedLang);
+            }
+            setupOtpInputHandlers();
+        });
+    </script>
+</body>
+</html>

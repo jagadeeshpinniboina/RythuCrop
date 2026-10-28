@@ -56,6 +56,10 @@ class TestRythuCropMaster(unittest.TestCase):
 
     def setUp(self):
         self.client = app.test_client()
+        with self.client.session_transaction() as sess:
+            sess["is_authenticated"] = True
+            sess["mobile"] = "+919876543210"
+            sess["user_id"] = "+919876543210"
 
     # 1. Startup & Web Routes
     def test_01_app_startup_and_home(self):

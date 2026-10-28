@@ -1,5 +1,6 @@
 from flask import request, jsonify, render_template
 from app import app
+from app.services.auth_service import login_required
 from app.models.predictor import (
     CropInputError,
     recommend_crop,
@@ -15,11 +16,13 @@ from app.models.yield_predictor import (
 
 
 @app.route("/predict/", methods=["GET"])
+@login_required
 def predict_page():
     return render_template("predict.html")
 
 
 @app.route("/predict", methods=["POST"])
+@login_required
 def predict():
     data = request.get_json()
 
@@ -48,6 +51,7 @@ def predict():
 
 
 @app.route("/farm-plan", methods=["POST"])
+@login_required
 def farm_plan():
     """Farm Planning recommendation endpoint - preserves existing contract."""
     data = request.get_json()
@@ -72,6 +76,7 @@ def farm_plan():
 
 
 @app.route("/predict-yield", methods=["POST"])
+@login_required
 def predict_yield_api():
     """Location, crop, and year sensitive pre-harvest yield endpoint."""
     data = request.get_json()
