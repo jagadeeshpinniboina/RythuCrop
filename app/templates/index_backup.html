@@ -1,0 +1,1113 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>RythuCrop | Smart Agriculture</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<!-- ================= NAVBAR ================= -->
+
+<header class="navbar">
+
+    <div class="nav-container">
+
+  <a href="#home" class="brand">
+    <span class="brand-icon">&#127806;</span>
+    <span>RythuCrop</span>
+</a>
+
+        <nav>
+
+            <a href="#home">
+                Home
+            </a>
+
+            <a href="#recommendation">
+                Crop Recommendation
+            </a>
+
+            <a href="#yield">
+                Yield Prediction
+            </a>
+
+            <a href="#about">
+                About
+            </a>
+
+        </nav>
+
+    </div>
+
+</header>
+
+
+
+<!-- ================= HOME ================= -->
+
+<section id="home" class="home-section">
+
+    <!-- HOME CONTENT -->
+    <div class="home-content">
+
+        <!-- Badge -->
+        <span class="hero-badge">
+            SMART AGRICULTURE • MACHINE LEARNING
+        </span>
+
+        <!-- Main Heading -->
+        <h1>
+            Smart Agriculture.<br>
+            <span>Better Decisions.</span>
+        </h1>
+
+        <!-- Description -->
+        <p>
+            RythuCrop uses machine learning to recommend
+            suitable crops and predict agricultural yield
+            using soil, climate and farming parameters.
+        </p>
+
+        <!-- Action Buttons -->
+        <div class="hero-buttons">
+
+            <a href="#recommendation"
+               class="primary-button">
+                Crop Recommendation →
+            </a>
+
+            <a href="#yield"
+               class="secondary-button">
+                Predict Yield
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- HOME VISUAL -->
+    <div class="hero-visual">
+
+        <!-- Farmer Image -->
+        <div class="hero-circle">
+    <img
+        src="{{ url_for('static', filename='farmer-rice.png') }}"
+        alt="Farmer holding rice plants"
+    >
+</div>
+
+
+        <!-- Smart Farming Card -->
+        <div class="hero-small-card card-one">
+            🌱 Smart Farming
+        </div>
+
+
+        <!-- ML Powered Card -->
+        <div class="hero-small-card card-two">
+            ML ML Powered
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ================= FEATURES ================= -->
+
+<section class="features-section">
+
+    <div class="section-heading">
+
+        <span>OUR CAPABILITIES</span>
+
+        <h2>
+            Intelligent Tools for Modern Agriculture
+        </h2>
+
+        <p>
+            Use agricultural data to make smarter,
+            data-driven decisions.
+        </p>
+
+    </div>
+
+
+    <div class="feature-grid">
+
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+    &#x1F331;
+</div>
+            <h3>
+                Crop Recommendation
+            </h3>
+
+            <p>
+                Find a suitable crop based on soil
+                nutrients and weather conditions.
+            </p>
+
+            <a href="#recommendation">
+                Try Recommendation →
+            </a>
+
+        </div>
+
+
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                
+            </div>
+
+            <h3>
+                Yield Prediction
+            </h3>
+
+            <p>
+                Estimate crop yield using agricultural
+                and environmental parameters.
+            </p>
+
+            <a href="#yield">
+                Predict Yield →
+            </a>
+
+        </div>
+
+
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                ML
+            </div>
+
+            <h3>
+                Machine Learning
+            </h3>
+
+            <p>
+                Powered by trained machine learning
+                models for agricultural prediction.
+            </p>
+
+            <a href="#about">
+                Learn More →
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= CROP RECOMMENDATION ================= -->
+
+<section id="recommendation"
+         class="tool-section">
+
+
+    <div class="section-heading">
+
+        <span>CROP RECOMMENDATION</span>
+
+        <h2>
+            Find the Right Crop
+        </h2>
+
+        <p>
+            Enter soil and weather parameters to get
+            a suitable crop recommendation.
+        </p>
+
+    </div>
+
+
+
+    <div class="tool-card">
+
+
+        <form id="cropForm"
+              class="form-grid">
+
+
+            <!-- Nitrogen -->
+
+            <div class="form-group">
+
+                <label for="N">
+                    Nitrogen
+                    <span>(N)</span>
+                </label>
+
+                <input
+                    type="number"
+                    id="N"
+                    step="any"
+                    placeholder="e.g. 90"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Phosphorus -->
+
+            <div class="form-group">
+
+                <label for="P">
+                    Phosphorus
+                    <span>(P)</span>
+                </label>
+
+                <input
+                    type="number"
+                    id="P"
+                    step="any"
+                    placeholder="e.g. 42"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Potassium -->
+
+            <div class="form-group">
+
+                <label for="K">
+                    Potassium
+                    <span>(K)</span>
+                </label>
+
+                <input
+                    type="number"
+                    id="K"
+                    step="any"
+                    placeholder="e.g. 43"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Temperature -->
+
+            <div class="form-group">
+
+                <label for="temperature">
+                    Temperature
+                    <span>(°C)</span>
+                </label>
+
+                <input
+                    type="number"
+                    id="temperature"
+                    step="any"
+                    placeholder="e.g. 25"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Humidity -->
+
+            <div class="form-group">
+
+                <label for="humidity">
+                    Humidity
+                    <span>(%)</span>
+                </label>
+
+                <input
+                    type="number"
+                    id="humidity"
+                    step="any"
+                    placeholder="e.g. 80"
+                    required
+                >
+
+            </div>
+
+
+            <!-- pH -->
+
+            <div class="form-group">
+
+                <label for="ph">
+                    Soil pH
+                </label>
+
+                <input
+                    type="number"
+                    id="ph"
+                    step="any"
+                    placeholder="e.g. 6.5"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Rainfall -->
+
+            <div class="form-group">
+
+                <label for="rainfall">
+                    Rainfall
+                    <span>(mm)</span>
+                </label>
+
+                <input
+                    type="number"
+                    id="rainfall"
+                    step="any"
+                    placeholder="e.g. 200"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-action">
+
+                <button type="submit"
+                        class="primary-button">
+
+                    Recommend Crop →
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+
+        <!-- Recommendation Result -->
+
+        <div id="cropResult"
+             class="result-box hidden">
+
+            <div class="result-icon">
+                🌱
+            </div>
+
+            <div>
+
+                <span>
+                    RECOMMENDED CROP
+                </span>
+
+                <h3 id="recommendedCrop">
+                    --
+                </h3>
+
+                <p>
+                    Based on the soil and weather
+                    parameters provided.
+                </p>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= YIELD PREDICTION ================= -->
+
+<section id="yield"
+         class="tool-section yield-section">
+
+
+    <div class="section-heading">
+
+        <span>YIELD PREDICTION</span>
+
+        <h2>
+            Estimate Crop Yield
+        </h2>
+
+        <p>
+            Provide agricultural information to estimate
+            crop yield using machine learning.
+        </p>
+
+    </div>
+
+
+
+    <div class="tool-card">
+
+    <div class="feature-icon">📈</div>
+
+    <form id="yieldForm" class="form-grid">
+
+
+            <div class="form-group">
+
+                <label for="Crop">
+                    Crop
+                </label>
+
+                <input
+                    type="text"
+                    id="Crop"
+                    placeholder="e.g. Rice"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="Crop_Year">
+                    Crop Year
+                </label>
+
+                <input
+                    type="number"
+                    id="Crop_Year"
+                    placeholder="e.g. 2024"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="Season">
+                    Season
+                </label>
+
+                <input
+                    type="text"
+                    id="Season"
+                    placeholder="e.g. Kharif"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="State">
+                    State
+                </label>
+
+                <input
+                    type="text"
+                    id="State"
+                    placeholder="e.g. Andhra Pradesh"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="Area">
+                    Area
+                    <span>(hectares)</span>
+                </label>
+
+                <input
+                    type="number"
+                    id="Area"
+                    step="any"
+                    placeholder="e.g. 100"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="Production">
+                    Production
+                    <span>(tonnes)</span>
+                </label>
+
+                <input
+                    type="number"
+                    id="Production"
+                    step="any"
+                    placeholder="e.g. 500"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="Annual_Rainfall">
+                    Annual Rainfall
+                    <span>(mm)</span>
+                </label>
+
+                <input
+                    type="number"
+                    id="Annual_Rainfall"
+                    step="any"
+                    placeholder="e.g. 1200"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="Fertilizer">
+                    Fertilizer
+                    <span>(kg)</span>
+                </label>
+
+                <input
+                    type="number"
+                    id="Fertilizer"
+                    step="any"
+                    placeholder="e.g. 500"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="Pesticide">
+                    Pesticide
+                    <span>(kg)</span>
+                </label>
+
+                <input
+                    type="number"
+                    id="Pesticide"
+                    step="any"
+                    placeholder="e.g. 50"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-action">
+
+                <button type="submit"
+                        class="primary-button">
+
+                    Predict Crop Yield →
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+
+        <!-- Yield Result -->
+
+        <div id="yieldResult"
+             class="result-box hidden">
+
+            <div class="result-icon">
+                
+            </div>
+
+            <div>
+
+                <span>
+                    PREDICTED CROP YIELD
+                </span>
+
+                <h3 id="predictedYield">
+                    --
+                </h3>
+
+                <p>
+                    Estimated using the trained
+                    machine learning model.
+                </p>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= ABOUT ================= -->
+
+<section id="about"
+         class="about-section">
+
+
+    <div class="section-heading">
+
+        <span>ABOUT RythuCrop </span>
+
+        <h2>
+            Smart Agriculture Through Machine Learning
+        </h2>
+
+        <p>
+            RythuCrop combines agricultural data and
+            machine learning to support data-driven farming.
+        </p>
+
+    </div>
+
+
+
+    <div class="about-grid">
+
+
+        <div class="about-card">
+
+            <div class="feature-icon">
+                🌱
+            </div>
+
+            <h3>
+                Machine Learning
+            </h3>
+
+            <p>
+                Trained machine learning models process
+                agricultural and environmental parameters
+                to generate predictions.
+            </p>
+
+        </div>
+
+
+
+        <div class="about-card">
+
+            <div class="feature-icon">
+                &#x1F331;
+            </div>
+
+            <h3>
+                Smart Agriculture
+            </h3>
+
+            <p>
+                Helps users make data-driven decisions
+                using crop, soil and climate information.
+            </p>
+
+        </div>
+
+
+
+        <div class="about-card">
+
+            <div class="feature-icon">
+                Data
+            </div>
+
+            <h3>
+                Data Driven
+            </h3>
+
+            <p>
+                Uses structured agricultural datasets
+                for crop recommendation and yield prediction.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="technology-box">
+
+        <span>
+            TECHNOLOGIES
+        </span>
+
+        <p>
+            Python • Flask • Pandas • Scikit-learn •
+            Joblib • HTML • CSS • JavaScript
+        </p>
+
+    </div>
+
+
+</section>
+
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    <div class="footer-container">
+
+        <div>
+
+            <strong>
+                🌱 RythuCrop
+            </strong>
+
+            <p>
+                Smart Agriculture using Machine Learning
+            </p>
+
+        </div>
+
+
+        <div>
+
+            <p>
+                © 2026 RythuCrop
+            </p>
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+
+/* =========================================================
+   CROP RECOMMENDATION
+   ========================================================= */
+
+document
+    .getElementById("cropForm")
+    .addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+
+            const data = {
+
+                N:
+                    parseFloat(
+                        document
+                        .getElementById("N")
+                        .value
+                    ),
+
+                P:
+                    parseFloat(
+                        document
+                        .getElementById("P")
+                        .value
+                    ),
+
+                K:
+                    parseFloat(
+                        document
+                        .getElementById("K")
+                        .value
+                    ),
+
+                temperature:
+                    parseFloat(
+                        document
+                        .getElementById("temperature")
+                        .value
+                    ),
+
+                humidity:
+                    parseFloat(
+                        document
+                        .getElementById("humidity")
+                        .value
+                    ),
+
+                ph:
+                    parseFloat(
+                        document
+                        .getElementById("ph")
+                        .value
+                    ),
+
+                rainfall:
+                    parseFloat(
+                        document
+                        .getElementById("rainfall")
+                        .value
+                    )
+
+            };
+
+
+            const resultBox =
+                document
+                .getElementById("cropResult");
+
+
+            const result =
+                document
+                .getElementById("recommendedCrop");
+
+
+            resultBox.classList.remove("hidden");
+
+            result.textContent =
+                "Calculating...";
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/predict",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:
+                                JSON.stringify(data)
+                        }
+                    );
+
+
+                const output =
+                    await response.json();
+
+
+                if (
+                    output.recommended_crop
+                ) {
+
+                    result.textContent =
+                        output.recommended_crop;
+
+                } else {
+
+                    result.textContent =
+                        "Prediction failed";
+
+                    console.error(
+                        output.error
+                    );
+
+                }
+
+
+            } catch (error) {
+
+                result.textContent =
+                    "Server error";
+
+                console.error(error);
+
+            }
+
+        }
+    );
+
+
+
+/* =========================================================
+   YIELD PREDICTION
+   ========================================================= */
+
+document
+    .getElementById("yieldForm")
+    .addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+
+            const data = {
+
+                Crop:
+                    document
+                    .getElementById("Crop")
+                    .value,
+
+                Crop_Year:
+                    Number(
+                        document
+                        .getElementById("Crop_Year")
+                        .value
+                    ),
+
+                Season:
+                    document
+                    .getElementById("Season")
+                    .value,
+
+                State:
+                    document
+                    .getElementById("State")
+                    .value,
+
+                Area:
+                    Number(
+                        document
+                        .getElementById("Area")
+                        .value
+                    ),
+
+                Production:
+                    Number(
+                        document
+                        .getElementById("Production")
+                        .value
+                    ),
+
+                Annual_Rainfall:
+                    Number(
+                        document
+                        .getElementById("Annual_Rainfall")
+                        .value
+                    ),
+
+                Fertilizer:
+                    Number(
+                        document
+                        .getElementById("Fertilizer")
+                        .value
+                    ),
+
+                Pesticide:
+                    Number(
+                        document
+                        .getElementById("Pesticide")
+                        .value
+                    )
+
+            };
+
+
+            const resultBox =
+                document
+                .getElementById("yieldResult");
+
+
+            const result =
+                document
+                .getElementById("predictedYield");
+
+
+            resultBox.classList.remove("hidden");
+
+            result.textContent =
+                "Calculating...";
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/predict-yield",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:
+                                JSON.stringify(data)
+                        }
+                    );
+
+
+                const output =
+                    await response.json();
+
+
+                if (
+                    output.predicted_yield
+                    !== undefined
+                ) {
+
+                    result.textContent =
+                        Number(
+                            output.predicted_yield
+                        ).toFixed(2)
+                        + " tonnes/ha";
+
+                } else {
+
+                    result.textContent =
+                        "Prediction failed";
+
+                    console.error(
+                        output.error
+                    );
+
+                }
+
+
+            } catch (error) {
+
+                result.textContent =
+                    "Server error";
+
+                console.error(error);
+
+            }
+
+        }
+    );
+
+
+</script>
+
+
+</body>
+
+</html>

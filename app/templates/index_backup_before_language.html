@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RythuCrop | Smart Agriculture</title>
+
+    <style>
+        :root{
+            --green:#087f5b;
+            --green-dark:#075c43;
+            --green-soft:#eaf7f1;
+            --accent:#f4a340;
+            --text:#17352b;
+            --muted:#61756d;
+            --card:#ffffff;
+            --bg:#f7fbf8;
+            --border:#dcebe4;
+            --shadow:0 18px 50px rgba(17,70,52,.10);
+        }
+
+        *{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth}
+        body{
+            font-family:Arial,Helvetica,sans-serif;
+            background:var(--bg);
+            color:var(--text);
+            line-height:1.6;
+        }
+        body.dark{
+            --text:#edf8f2;
+            --muted:#b5c8c0;
+            --card:#12352a;
+            --bg:#071c15;
+            --border:#285044;
+            --green-soft:#123e31;
+            --shadow:0 18px 50px rgba(0,0,0,.25);
+        }
+        a{text-decoration:none;color:inherit}
+        button,input,select{font:inherit}
+        button{cursor:pointer}
+
+        .navbar{
+            position:sticky;
+            top:0;
+            z-index:1000;
+            background:rgba(255,255,255,.94);
+            backdrop-filter:blur(14px);
+            border-bottom:1px solid var(--border);
+        }
+        body.dark .navbar{background:rgba(7,28,21,.94)}
+        .nav-container{
+            max-width:1250px;
+            margin:auto;
+            padding:14px 24px 10px;
+        }
+        .nav-main{
+            min-height:58px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:20px;
+        }
+        .brand{display:flex;align-items:center;gap:10px;font-size:21px;font-weight:800}
+        .brand-icon{
+            width:40px;height:40px;border-radius:50%;
+            display:grid;place-items:center;
+            background:var(--green);color:white;
+        }
+        nav{display:flex;align-items:center;gap:25px}
+        nav a{font-size:14px;font-weight:700;color:var(--muted)}
+        nav a:hover,nav a.active{color:var(--green)}
+        .nav-controls{
+            display:flex;
+            justify-content:flex-end;
+            align-items:center;
+            gap:10px;
+            padding:4px 0 2px;
+        }
+        .control{
+            border:1px solid var(--border);
+            background:var(--card);
+            color:var(--text);
+            border-radius:999px;
+            padding:8px 12px;
+        }
+        .language{min-width:130px}
+        .theme-btn{width:42px;height:38px;padding:0}
+        .mobile-menu{display:none}
+
+        section{scroll-margin-top:120px}
+        .hero{
+            min-height:700px;
+            display:flex;
+            align-items:center;
+            position:relative;
+            overflow:hidden;
+            color:white;
+            background:
+                linear-gradient(90deg,rgba(4,34,24,.90) 0%,rgba(4,34,24,.67) 46%,rgba(4,34,24,.24) 100%),
+                url("{{ url_for('static', filename='farmer-rice.png') }}") center/cover no-repeat;
+        }
+        .hero::after{
+            content:"";
+            position:absolute;inset:auto 0 0;
+            height:120px;
+            background:linear-gradient(transparent,var(--bg));
+        }
+        .hero-inner{
+            width:min(1250px,100%);
+            margin:auto;
+            padding:90px 24px 130px;
+            position:relative;
+            z-index:2;
+        }
+        .badge{
+            display:inline-block;
+            padding:8px 14px;
+            border-radius:999px;
+            background:rgba(255,255,255,.13);
+            border:1px solid rgba(255,255,255,.25);
+            font-size:12px;
+            font-weight:800;
+            letter-spacing:.7px;
+        }
+        .hero h1{
+            max-width:720px;
+            font-size:clamp(42px,6vw,78px);
+            line-height:1.02;
+            margin:22px 0;
+        }
+        .hero h1 span{color:#7de1b7}
+        .hero p{max-width:680px;color:#e4f1eb;font-size:18px}
+        .hero-buttons{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+        .btn{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            border:0;
+            border-radius:12px;
+            padding:13px 20px;
+            font-weight:800;
+            transition:.2s;
+        }
+        .btn-primary{background:var(--accent);color:#3b270f}
+        .btn-secondary{background:rgba(255,255,255,.12);color:white;border:1px solid rgba(255,255,255,.35)}
+        .btn:hover{transform:translateY(-2px)}
+
+        .weather-card{
+            position:absolute;
+            right:6%;
+            bottom:20%;
+            z-index:3;
+            width:285px;
+            padding:22px;
+            border-radius:24px;
+            background:rgba(255,255,255,.14);
+            border:1px solid rgba(255,255,255,.30);
+            backdrop-filter:blur(14px);
+        }
+        .weather-card small{opacity:.8}
+        .weather-temp{font-size:42px;font-weight:900;margin:8px 0}
+
+        .section{
+            max-width:1250px;
+            margin:auto;
+            padding:90px 24px;
+        }
+        .section-heading{max-width:780px;margin-bottom:35px}
+        .eyebrow{
+            color:var(--green);
+            font-size:12px;
+            font-weight:900;
+            letter-spacing:1.5px;
+        }
+        .section-heading h2{font-size:clamp(30px,4vw,50px);line-height:1.1;margin:10px 0 15px}
+        .section-heading p{color:var(--muted);font-size:17px}
+
+        .planner{
+            display:grid;
+            grid-template-columns:1.1fr .9fr;
+            gap:24px;
+        }
+        .card{
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:24px;
+            padding:28px;
+            box-shadow:var(--shadow);
+        }
+        .form-grid{
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:18px;
+        }
+        .form-group{display:flex;flex-direction:column;gap:7px}
+        label{font-weight:800;font-size:14px}
+        input,select{
+            width:100%;
+            border:1px solid var(--border);
+            background:var(--bg);
+            color:var(--text);
+            border-radius:12px;
+            padding:13px 14px;
+            outline:none;
+        }
+        input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(8,127,91,.10)}
+        .full{grid-column:1/-1}
+        .result-panel{
+            background:linear-gradient(145deg,var(--green),var(--green-dark));
+            color:white;
+            border-radius:24px;
+            padding:30px;
+            min-height:100%;
+        }
+        .result-panel h3{font-size:28px;margin:10px 0}
+        .recommendation-list{display:grid;gap:12px;margin-top:20px}
+        .recommendation-item{
+            background:rgba(255,255,255,.10);
+            border:1px solid rgba(255,255,255,.18);
+            border-radius:14px;
+            padding:13px;
+        }
+        .check-row{display:flex;gap:10px;align-items:flex-start}
+        .check-row input{width:auto;margin-top:5px}
+
+        .capability-grid{
+            display:grid;
+            grid-template-columns:repeat(3,1fr);
+            gap:20px;
+        }
+        .capability-card{
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:22px;
+            padding:25px;
+            transition:.2s;
+        }
+        .capability-card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+        .icon{
+            width:48px;height:48px;border-radius:15px;
+            display:grid;place-items:center;
+            background:var(--green-soft);
+            color:var(--green);
+            font-size:23px;
+            margin-bottom:18px;
+        }
+        .capability-card h3{margin-bottom:7px}
+        .capability-card p{color:var(--muted)}
+
+        .about-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+        .about-card{padding:28px;border-radius:22px;background:var(--card);border:1px solid var(--border)}
+        .about-card p{color:var(--muted);margin-top:8px}
+
+        .hidden{display:none!important}
+        .success{color:#7de1b7;font-weight:900}
+        .error{color:#ffb4a8;font-weight:800}
+        .loading{opacity:.7}
+
+        footer{
+            background:#082b20;
+            color:#dceee7;
+            padding:45px 24px;
+        }
+        .footer-inner{
+            max-width:1250px;margin:auto;
+            display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+        }
+
+        @media(max-width:950px){
+            nav{display:none}
+            .mobile-menu{display:block;border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:10px;padding:8px 11px}
+            .nav-main{flex-wrap:wrap}
+            nav.open{display:flex;width:100%;flex-direction:column;align-items:flex-start;gap:14px;padding:12px 0}
+            .weather-card{position:relative;right:auto;bottom:auto;margin:35px 24px 0}
+            .hero-inner{padding-bottom:60px}
+            .hero{min-height:780px;display:block;padding-top:70px}
+            .planner{grid-template-columns:1fr}
+            .capability-grid,.about-grid{grid-template-columns:repeat(2,1fr)}
+        }
+        @media(max-width:650px){
+            .nav-container{padding-left:15px;padding-right:15px}
+            .nav-controls{justify-content:space-between}
+            .language{flex:1}
+            .hero h1{font-size:45px}
+            .hero p{font-size:16px}
+            .section{padding:65px 15px}
+            .form-grid{grid-template-columns:1fr}
+            .full{grid-column:auto}
+            .capability-grid,.about-grid{grid-template-columns:1fr}
+            .card{padding:20px}
+        }
+
+        /* =========================================================
+           RYTHUCROP — FINAL LAPTOP ONE-SCREEN FIX
+           The page uses an inline <style> block in index.html,
+           so this override must be inside this file.
+           ========================================================= */
+
+        @media (min-width: 951px) {
+
+            :root {
+                --slide-navbar-height: 120px;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: var(--slide-navbar-height);
+            }
+
+            body {
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+
+            /* Navbar occupies two rows in this design */
+            .navbar {
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+            }
+
+   /* =========================================================
+   ONE COMPLETE SCREEN FOR EACH NAVIGATION SECTION
+   ========================================================= */
+
+#home,
+#planning,
+#recommendation,
+#yield,
+#advisory,
+#about {
+    width: 100%;
+    max-width: none;
+
+    height: calc(100dvh - var(--slide-navbar-height));
+    min-height: 0;
+    max-height: calc(100dvh - var(--slide-navbar-height));
+
+    margin: 0;
+    padding: 24px 24px;
+
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    overflow: hidden;
+
+    scroll-margin-top: var(--slide-navbar-height);
+}
+            /* Home */
+            #home {
+                padding: 0;
+            }
+
+            #home .hero-inner {
+                width: min(1250px, 100%);
+                padding: 35px 24px;
+            }
+
+            /* All tool/about sections */
+            #planning.section,
+            #recommendation.section,
+            #yield.section,
+            #advisory.section,
+            #about.section {
+                padding: 24px;
+            }
+
+            /* Compact headings */
+            #planning .section-heading,
+            #recommendation .section-heading,
+            #yield .section-heading,
+            #advisory .section-heading,
+            #about .section-heading {
+                width: min(1250px, 100%);
+                max-width: 1250px;
+                margin: 0 auto 14px;
+            }
+
+            #planning .section-heading h2,
+            #recommendation .section-heading h2,
+            #yield .section-heading h2,
+            #advisory .section-heading h2,
+            #about .section-heading h2 {
+                font-size: 32px;
+                line-height: 1.12;
+                margin: 5px 0 6px;
+            }
+
+            #planning .section-heading p,
+            #recommendation .section-heading p,
+            #yield .section-heading p,
+            #advisory .section-heading p,
+            #about .section-heading p {
+                font-size: 13px;
+                line-height: 1.4;
+            }
+
+            /* Planning / Advisory layout */
+            #planning .planner,
+            #advisory .planner {
+                width: min(1250px, 100%);
+                margin: 0 auto;
+                grid-template-columns: 1.1fr .9fr;
+                gap: 14px;
+                min-height: 0;
+                flex: 0 0 auto;
+            }
+
+            /* Cards */
+            #planning .card,
+            #recommendation .card,
+            #yield .card,
+            #advisory .card {
+                padding: 18px;
+                min-height: 0;
+                overflow: hidden;
+                border-radius: 20px;
+            }
+
+            /* Form spacing */
+            #planning .form-grid,
+            #recommendation .form-grid,
+            #yield .form-grid,
+            #advisory .form-grid {
+                gap: 8px 14px;
+            }
+
+            #planning .form-group,
+            #recommendation .form-group,
+            #yield .form-group,
+            #advisory .form-group {
+                gap: 4px;
+            }
+
+            #planning label,
+            #recommendation label,
+            #yield label,
+            #advisory label {
+                font-size: 13px;
+            }
+
+            #planning input,
+            #planning select,
+            #recommendation input,
+            #recommendation select,
+            #yield input,
+            #yield select,
+            #advisory input,
+            #advisory select {
+                height: 38px;
+                min-height: 38px;
+                padding: 7px 11px;
+                font-size: 13px;
+            }
+
+            /* Result panels */
+            #planning .result-panel,
+            #advisory .result-panel {
+                min-height: 0;
+                height: 100%;
+                max-height: 100%;
+                padding: 18px;
+                overflow: hidden;
+            }
+
+            #recommendation .result-panel,
+            #yield .result-panel {
+                max-height: 110px;
+                overflow: hidden;
+            }
+
+            #planning .recommendation-list,
+            #advisory .recommendation-list {
+                max-height: 150px;
+                overflow: hidden;
+            }
+
+            /* About */
+            #about .about-grid {
+                width: min(1250px, 100%);
+                margin: 0 auto;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 14px;
+            }
+
+            #about .about-card {
+                padding: 18px;
+            }
+        }
+
+
+        /* =========================================================
+           RYTHUCROP FINAL DESKTOP FIX
+           This is intentionally last so it overrides all earlier
+           desktop section rules in this same inline stylesheet.
+           ========================================================= */
+        @media (min-width:951px){
+
+            /* Real navbar height is measured by JS below. */
+            :root{
+                --actual-navbar-height:120px;
+            }
+
+            html{
+                scroll-behavior:smooth;
+                scroll-padding-top:var(--actual-navbar-height);
+            }
+
+            #home,
+            #planning,
+            #recommendation,
+            #yield,
+            #advisory,
+            #about{
+                width:100%;
+                max-width:none;
+                height:auto;
+                min-height:0;
+                max-height:none;
+                margin:0;
+                box-sizing:border-box;
+                overflow:hidden;
+                scroll-margin-top:var(--actual-navbar-height);
+            }
+
+            /* Tool sections */
+            #planning,
+            #recommendation,
+            #yield,
+            #advisory,
+            #about{
+                padding:16px 24px;
+                display:flex;
+                flex-direction:column;
+                justify-content:center;
+            }
+
+            #planning .section-heading,
+            #recommendation .section-heading,
+            #yield .section-heading,
+            #advisory .section-heading,
+            #about .section-heading{
+                margin:0 auto 8px;
+                width:min(1250px,100%);
+                max-width:1250px;
+                flex:0 0 auto;
+            }
+
+            #planning .section-heading h2,
+            #recommendation .section-heading h2,
+            #yield .section-heading h2,
+            #advisory .section-heading h2,
+            #about .section-heading h2{
+                font-size:28px;
+                line-height:1.08;
+                margin:3px 0 4px;
+            }
+
+            #planning .section-heading p,
+            #recommendation .section-heading p,
+            #yield .section-heading p,
+            #advisory .section-heading p,
+            #about .section-heading p{
+                font-size:12px;
+                line-height:1.25;
+            }
+
+            #planning .planner,
+            #advisory .planner{
+                width:min(1250px,100%);
+                margin:0 auto;
+                grid-template-columns:1.1fr .9fr;
+                gap:12px;
+                min-height:0;
+                max-height:calc(100% - 70px);
+                flex:1 1 auto;
+            }
+
+            #planning .card,
+            #recommendation .card,
+            #yield .card,
+            #advisory .card{
+                min-height:0;
+                max-height:100%;
+                padding:14px 18px;
+                overflow:hidden;
+                border-radius:20px;
+            }
+
+            #planning .form-grid,
+            #recommendation .form-grid,
+            #yield .form-grid,
+            #advisory .form-grid{
+                gap:6px 12px;
+            }
+
+            #planning .form-group,
+            #recommendation .form-group,
+            #yield .form-group,
+            #advisory .form-group{
+                gap:2px;
+            }
+
+            #planning label,
+            #recommendation label,
+            #yield label,
+            #advisory label{
+                font-size:12px;
+                line-height:1.2;
+            }
+
+            #planning input,
+            #planning select,
+            #recommendation input,
+            #recommendation select,
+            #yield input,
+            #yield select,
+            #advisory input,
+            #advisory select{
+                height:34px;
+                min-height:34px;
+                padding:5px 10px;
+                font-size:12px;
+            }
+
+            #planning .btn,
+            #recommendation .btn,
+            #yield .btn,
+            #advisory .btn{
+                padding:8px 14px;
+                font-size:12px;
+            }
+
+            #planning .result-panel,
+            #advisory .result-panel{
+                min-height:0;
+                height:100%;
+                max-height:100%;
+                padding:14px;
+                overflow:hidden;
+            }
+
+            #planning .recommendation-list,
+            #advisory .recommendation-list{
+                gap:6px;
+                margin-top:8px;
+                max-height:120px;
+                overflow:hidden;
+            }
+
+            #planning .recommendation-item,
+            #advisory .recommendation-item{
+                padding:7px 9px;
+                font-size:11px;
+            }
+
+            /* Recommendation + yield */
+            #recommendation .card,
+            #yield .card{
+                width:min(1250px,100%);
+                margin:0 auto;
+                flex:0 0 auto;
+            }
+
+            #recommendation .result-panel,
+            #yield .result-panel{
+                max-height:80px !important;
+                min-height:0 !important;
+                margin-top:8px !important;
+                padding:9px 12px;
+                overflow:hidden;
+            }
+
+            #recommendation .result-panel h3,
+            #yield .result-panel h3{
+                font-size:19px;
+                margin:2px 0;
+            }
+
+            /* About */
+            #about .about-grid{
+                width:min(1250px,100%);
+                margin:0 auto;
+                grid-template-columns:repeat(3,1fr);
+                gap:12px;
+                flex:0 0 auto;
+            }
+
+            #about .about-card{
+                padding:14px;
+            }
+
+            #about .about-card p{
+                font-size:12px;
+                line-height:1.3;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+<header class="navbar">
+    <div class="nav-container">
+        <div class="nav-main">
+            <a class="brand" href="#home">
+                <span class="brand-icon">🌾</span>
+                <span>RythuCrop</span>
+            </a>
+
+            <button class="mobile-menu" id="menuBtn">☰</button>
+
+            <nav id="mainNav">
+                <a href="#home" data-i18n="nav_home">Home</a>
+                <a href="#planning" data-i18n="nav_planning">Farm Planning</a>
+                <a href="#recommendation" data-i18n="nav_crop">Crop Recommendation</a>
+                <a href="#yield" data-i18n="nav_yield">Yield Prediction</a>
+                <a href="#advisory" data-i18n="nav_advisory">Smart Advisory</a>
+                <a href="#about" data-i18n="nav_about">About</a>
+            </nav>
+        </div>
+
+        <div class="nav-controls">
+            <select id="language" class="control language" aria-label="Language">
+                <option value="en">🌐 English</option>
+                <option value="te">తెలుగు</option>
+                <option value="hi">हिन्दी</option>
+                <option value="ta">தமிழ்</option>
+                <option value="kn">ಕನ್ನಡ</option>
+                <option value="ml">മലയാളം</option>
+                <option value="mr">मराठी</option>
+                <option value="bn">বাংলা</option>
+            </select>
+            <button id="themeBtn" class="control theme-btn" title="Toggle day/night">☀️</button>
+        </div>
+    </div>
+</header>
+
+<main>
+<section id="home" class="hero">
+    <div class="hero-inner">
+        <span class="badge" data-i18n="hero_badge">SMART AGRICULTURE • MACHINE LEARNING</span>
+        <h1>
+            <span data-i18n="hero_title1">Smart Farming.</span><br>
+            <span data-i18n="hero_title2">Better Decisions.</span>
+        </h1>
+        <p data-i18n="hero_desc">
+            RythuCrop helps farmers choose suitable crops, estimate yield and plan farming decisions using agricultural data and machine learning.
+        </p>
+        <div class="hero-buttons">
+            <a href="#planning" class="btn btn-primary" data-i18n="hero_btn1">Start Farm Planning →</a>
+            <a href="#recommendation" class="btn btn-secondary" data-i18n="hero_btn2">Get Crop Recommendation</a>
+        </div>
+    </div>
+
+    <div class="weather-card">
+        <small data-i18n="hero_card_title">FARM DECISION SUPPORT</small>
+        <div class="weather-temp">🌱</div>
+        <strong data-i18n="hero_card_main">From soil to harvest</strong>
+        <p data-i18n="hero_card_desc">Enter your farm requirements and receive practical suggestions.</p>
+    </div>
+</section>
+
+<section id="planning" class="section">
+    <div class="section-heading">
+        <span class="eyebrow" data-i18n="plan_eyebrow">FARM PLANNING</span>
+        <h2 data-i18n="plan_title">Tell us about your farm</h2>
+        <p data-i18n="plan_desc">Choose simple options. RythuCrop will convert your requirements into a practical starting plan.</p>
+    </div>
+
+    <div class="planner">
+        <div class="card">
+            <form id="planningForm" class="form-grid">
+                <div class="form-group">
+                    <label data-i18n="land">Land area (acres)</label>
+                    <input id="land" type="number" min="0.1" step="0.1" placeholder="e.g. 2" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="season">Season</label>
+                    <select id="season">
+                        <option>Kharif</option>
+                        <option>Rabi</option>
+                        <option>Summer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="soil">Soil type</label>
+                    <select id="soil">
+                        <option>Loamy</option>
+                        <option>Black Soil</option>
+                        <option>Red Soil</option>
+                        <option>Clay Soil</option>
+                        <option>Sandy Soil</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="irrigation">Irrigation</label>
+                    <select id="irrigation">
+                        <option>Good water availability</option>
+                        <option>Moderate water availability</option>
+                        <option>Low water availability</option>
+                        <option>Rainfed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="goal">Main goal</label>
+                    <select id="goal">
+                        <option>Higher yield</option>
+                        <option>Lower water use</option>
+                        <option>Lower input cost</option>
+                        <option>Balanced farming</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="experience">Farming experience</label>
+                    <select id="experience">
+                        <option>Beginner</option>
+                        <option>Some experience</option>
+                        <option>Experienced</option>
+                    </select>
+                </div>
+                <div class="full">
+                    <button class="btn btn-primary" type="submit" data-i18n="generate_plan">Generate My Plan →</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="result-panel">
+            <small data-i18n="plan_result_label">YOUR STARTING PLAN</small>
+            <h3 id="planTitle" data-i18n="plan_result_title">Your recommendations will appear here</h3>
+            <p id="planSummary" data-i18n="plan_result_desc">Select your farm requirements and click Generate My Plan.</p>
+            <div id="planResults" class="recommendation-list"></div>
+        </div>
+    </div>
+</section>
+
+<section id="recommendation" class="section">
+    <div class="section-heading">
+        <span class="eyebrow" data-i18n="crop_eyebrow">CROP RECOMMENDATION</span>
+        <h2 data-i18n="crop_title">Find the right crop</h2>
+        <p data-i18n="crop_desc">Enter the soil and climate values used by the existing trained recommendation model.</p>
+    </div>
+
+    <div class="card">
+        <form id="cropForm" class="form-grid">
+            <div class="form-group"><label>Nitrogen (N)</label><input id="N" type="number" step="any" placeholder="e.g. 90" required></div>
+            <div class="form-group"><label>Phosphorus (P)</label><input id="P" type="number" step="any" placeholder="e.g. 42" required></div>
+            <div class="form-group"><label>Potassium (K)</label><input id="K" type="number" step="any" placeholder="e.g. 43" required></div>
+            <div class="form-group"><label>Temperature (°C)</label><input id="temperature" type="number" step="any" placeholder="e.g. 25" required></div>
+            <div class="form-group"><label>Humidity (%)</label><input id="humidity" type="number" step="any" placeholder="e.g. 80" required></div>
+            <div class="form-group"><label>Soil pH</label><input id="ph" type="number" step="any" placeholder="e.g. 6.5" required></div>
+            <div class="form-group"><label>Rainfall (mm)</label><input id="rainfall" type="number" step="any" placeholder="e.g. 200" required></div>
+            <div class="full">
+                <button type="submit" class="btn btn-primary" data-i18n="recommend_btn">Recommend Crop →</button>
+            </div>
+        </form>
+
+        <div id="cropResult" class="result-panel hidden" style="margin-top:24px;min-height:auto">
+            <small data-i18n="recommended">RECOMMENDED CROP</small>
+            <h3 id="recommendedCrop">--</h3>
+            <p data-i18n="crop_result_desc">Based on the soil and climate values provided.</p>
+        </div>
+    </div>
+</section>
+
+<section id="yield" class="section">
+    <div class="section-heading">
+        <span class="eyebrow" data-i18n="yield_eyebrow">YIELD PREDICTION</span>
+        <h2 data-i18n="yield_title">Estimate your crop yield</h2>
+        <p data-i18n="yield_desc">Provide the agricultural information required by the existing trained yield model.</p>
+    </div>
+
+    <div class="card">
+        <form id="yieldForm" class="form-grid">
+            <div class="form-group"><label>Crop</label><input id="Crop" type="text" placeholder="e.g. Rice" required></div>
+            <div class="form-group"><label>Crop Year</label><input id="Crop_Year" type="number" placeholder="e.g. 2024" required></div>
+            <div class="form-group"><label>Season</label><input id="Season" type="text" placeholder="e.g. Kharif" required></div>
+            <div class="form-group"><label>State</label><input id="State" type="text" placeholder="e.g. Andhra Pradesh" required></div>
+            <div class="form-group"><label>Area (hectares)</label><input id="Area" type="number" step="any" placeholder="e.g. 100" required></div>
+            <div class="form-group"><label>Production (tonnes)</label><input id="Production" type="number" step="any" placeholder="e.g. 500" required></div>
+            <div class="form-group"><label>Annual Rainfall (mm)</label><input id="Annual_Rainfall" type="number" step="any" placeholder="e.g. 1200" required></div>
+            <div class="form-group"><label>Fertilizer (kg)</label><input id="Fertilizer" type="number" step="any" placeholder="e.g. 500" required></div>
+            <div class="form-group"><label>Pesticide (kg)</label><input id="Pesticide" type="number" step="any" placeholder="e.g. 50" required></div>
+            <div class="full">
+                <button type="submit" class="btn btn-primary" data-i18n="yield_btn">Predict Crop Yield →</button>
+            </div>
+        </form>
+
+        <div id="yieldResult" class="result-panel hidden" style="margin-top:24px;min-height:auto">
+            <small data-i18n="predicted">PREDICTED CROP YIELD</small>
+            <h3 id="predictedYield">--</h3>
+            <p data-i18n="yield_result_desc">Estimated using the trained machine learning model.</p>
+        </div>
+    </div>
+</section>
+
+<section id="advisory" class="section">
+    <div class="section-heading">
+        <span class="eyebrow" data-i18n="advisory_eyebrow">SMART ADVISORY</span>
+        <h2 data-i18n="advisory_title">What should I do next?</h2>
+        <p data-i18n="advisory_desc">Choose your crop and priority. The system gives a simple action checklist.</p>
+    </div>
+
+    <div class="planner">
+        <div class="card">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label data-i18n="advisory_crop">Crop</label>
+                    <select id="adCrop">
+                        <option>Rice</option><option>Wheat</option><option>Maize</option>
+                        <option>Cotton</option><option>Groundnut</option><option>Chickpea</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="advisory_priority">Priority</label>
+                    <select id="adPriority">
+                        <option>Water saving</option>
+                        <option>Fertilizer management</option>
+                        <option>Pest prevention</option>
+                        <option>Higher yield</option>
+                    </select>
+                </div>
+                <div class="full">
+                    <button class="btn btn-primary" id="adviceBtn" type="button" data-i18n="get_advice">Get My Advice →</button>
+                </div>
+            </div>
+        </div>
+        <div class="result-panel">
+            <small data-i18n="advice_label">NEXT ACTIONS</small>
+            <h3 id="adviceTitle">Choose your priority</h3>
+            <div id="adviceList" class="recommendation-list"></div>
+        </div>
+    </div>
+</section>
+
+<section id="about" class="section">
+    <div class="section-heading">
+        <span class="eyebrow" data-i18n="about_eyebrow">ABOUT RYTHUCROP</span>
+        <h2 data-i18n="about_title">Simple technology for better farming decisions</h2>
+        <p data-i18n="about_desc">RythuCrop connects a farmer-friendly interface with the project's existing machine learning models.</p>
+    </div>
+
+    <div class="about-grid">
+        <div class="about-card">
+            <div class="icon">🤖</div>
+            <h3 data-i18n="about_ml">Machine Learning</h3>
+            <p data-i18n="about_ml_desc">Existing trained models are used for crop recommendation and yield prediction.</p>
+        </div>
+        <div class="about-card">
+            <div class="icon">🌱</div>
+            <h3 data-i18n="about_farmer">Farmer First</h3>
+            <p data-i18n="about_farmer_desc">Simple choices and clear outputs are designed for easy use.</p>
+        </div>
+        <div class="about-card">
+            <div class="icon">📱</div>
+            <h3 data-i18n="about_mobile">Mobile Friendly</h3>
+            <p data-i18n="about_mobile_desc">The interface adapts to mobile, tablet and desktop screens.</p>
+        </div>
+    </div>
+</section>
+</main>
+
+<footer>
+    <div class="footer-inner">
+        <div>
+            <strong>🌾 RythuCrop</strong>
+            <p data-i18n="footer_desc">Smart agriculture using machine learning.</p>
+        </div>
+        <div><p>© 2026 RythuCrop</p></div>
+    </div>
+</footer>
+
+<script>
+const translations = {
+    en:{
+        nav_home:"Home",nav_planning:"Farm Planning",nav_crop:"Crop Recommendation",nav_yield:"Yield Prediction",nav_advisory:"Smart Advisory",nav_about:"About",
+        hero_badge:"SMART AGRICULTURE • MACHINE LEARNING",hero_title1:"Smart Farming.",hero_title2:"Better Decisions.",
+        hero_desc:"RythuCrop helps farmers choose suitable crops, estimate yield and plan farming decisions using agricultural data and machine learning.",
+        hero_btn1:"Start Farm Planning →",hero_btn2:"Get Crop Recommendation",hero_card_title:"FARM DECISION SUPPORT",hero_card_main:"From soil to harvest",hero_card_desc:"Enter your farm requirements and receive practical suggestions.",
+        plan_eyebrow:"FARM PLANNING",plan_title:"Tell us about your farm",plan_desc:"Choose simple options. RythuCrop will convert your requirements into a practical starting plan.",
+        land:"Land area (acres)",season:"Season",soil:"Soil type",irrigation:"Irrigation",goal:"Main goal",experience:"Farming experience",generate_plan:"Generate My Plan →",
+        plan_result_label:"YOUR STARTING PLAN",plan_result_title:"Your recommendations will appear here",plan_result_desc:"Select your farm requirements and click Generate My Plan.",
+        crop_eyebrow:"CROP RECOMMENDATION",crop_title:"Find the right crop",crop_desc:"Enter the soil and climate values used by the existing trained recommendation model.",
+        recommend_btn:"Recommend Crop →",recommended:"RECOMMENDED CROP",crop_result_desc:"Based on the soil and climate values provided.",
+        yield_eyebrow:"YIELD PREDICTION",yield_title:"Estimate your crop yield",yield_desc:"Provide the agricultural information required by the existing trained yield model.",
+        yield_btn:"Predict Crop Yield →",predicted:"PREDICTED CROP YIELD",yield_result_desc:"Estimated using the trained machine learning model.",
+        advisory_eyebrow:"SMART ADVISORY",advisory_title:"What should I do next?",advisory_desc:"Choose your crop and priority. The system gives a simple action checklist.",
+        advisory_crop:"Crop",advisory_priority:"Priority",get_advice:"Get My Advice →",advice_label:"NEXT ACTIONS",
+        about_eyebrow:"ABOUT RYTHUCROP",about_title:"Simple technology for better farming decisions",about_desc:"RythuCrop connects a farmer-friendly interface with the project's existing machine learning models.",
+        about_ml:"Machine Learning",about_ml_desc:"Existing trained models are used for crop recommendation and yield prediction.",
+        about_farmer:"Farmer First",about_farmer_desc:"Simple choices and clear outputs are designed for easy use.",
+        about_mobile:"Mobile Friendly",about_mobile_desc:"The interface adapts to mobile, tablet and desktop screens.",
+        footer_desc:"Smart agriculture using machine learning."
+    },
+    te:{
+        nav_home:"హోమ్",nav_planning:"వ్యవసాయ ప్రణాళిక",nav_crop:"పంట సిఫార్సు",nav_yield:"దిగుబడి అంచనా",nav_advisory:"స్మార్ట్ సలహా",nav_about:"మా గురించి",
+        hero_badge:"స్మార్ట్ వ్యవసాయం • మెషిన్ లెర్నింగ్",hero_title1:"స్మార్ట్ వ్యవసాయం.",hero_title2:"మెరుగైన నిర్ణయాలు.",
+        hero_desc:"వ్యవసాయ డేటా మరియు మెషిన్ లెర్నింగ్ ఆధారంగా సరైన పంటను ఎంచుకోవడానికి, దిగుబడిని అంచనా వేయడానికి RythuCrop సహాయపడుతుంది.",
+        hero_btn1:"వ్యవసాయ ప్రణాళిక ప్రారంభించండి →",hero_btn2:"పంట సిఫార్సు పొందండి",hero_card_title:"వ్యవసాయ నిర్ణయ సహాయం",hero_card_main:"నేల నుండి పంట వరకు",hero_card_desc:"మీ వ్యవసాయ అవసరాలను నమోదు చేసి సులభమైన సూచనలు పొందండి.",
+        plan_eyebrow:"వ్యవసాయ ప్రణాళిక",plan_title:"మీ పొలం గురించి చెప్పండి",plan_desc:"సులభమైన ఎంపికలు చేయండి. మీ అవసరాలకు సరిపోయే ప్రారంభ ప్రణాళికను RythuCrop సూచిస్తుంది.",
+        land:"భూమి విస్తీర్ణం (ఎకరాలు)",season:"సీజన్",soil:"నేల రకం",irrigation:"నీటి సౌకర్యం",goal:"ప్రధాన లక్ష్యం",experience:"వ్యవసాయ అనుభవం",generate_plan:"నా ప్రణాళిక తయారు చేయండి →",
+        plan_result_label:"మీ ప్రారంభ ప్రణాళిక",plan_result_title:"మీ సూచనలు ఇక్కడ కనిపిస్తాయి",plan_result_desc:"మీ అవసరాలను ఎంచుకుని 'నా ప్రణాళిక'ను నొక్కండి.",
+        crop_eyebrow:"పంట సిఫార్సు",crop_title:"సరైన పంటను కనుగొనండి",crop_desc:"ఇప్పటికే ఉన్న పంట సిఫార్సు ML మోడల్‌కు అవసరమైన నేల మరియు వాతావరణ విలువలను నమోదు చేయండి.",
+        recommend_btn:"పంట సిఫార్సు చేయండి →",recommended:"సిఫార్సు చేసిన పంట",crop_result_desc:"మీరు ఇచ్చిన నేల మరియు వాతావరణ విలువల ఆధారంగా.",
+        yield_eyebrow:"దిగుబడి అంచనా",yield_title:"మీ పంట దిగుబడిని అంచనా వేయండి",yield_desc:"ఇప్పటికే ఉన్న yield ML మోడల్‌కు అవసరమైన వ్యవసాయ సమాచారాన్ని ఇవ్వండి.",
+        yield_btn:"పంట దిగుబడి అంచనా →",predicted:"అంచనా పంట దిగుబడి",yield_result_desc:"శిక్షణ పొందిన మెషిన్ లెర్నింగ్ మోడల్ ఆధారంగా.",
+        advisory_eyebrow:"స్మార్ట్ సలహా",advisory_title:"తర్వాత నేను ఏమి చేయాలి?",advisory_desc:"పంట మరియు మీ ప్రధాన అవసరాన్ని ఎంచుకోండి. సులభమైన చర్యల జాబితా వస్తుంది.",
+        advisory_crop:"పంట",advisory_priority:"ప్రాధాన్యత",get_advice:"నా సలహా పొందండి →",advice_label:"తదుపరి చర్యలు",
+        about_eyebrow:"RYTHUCROP గురించి",about_title:"మెరుగైన వ్యవసాయ నిర్ణయాల కోసం సులభమైన సాంకేతికత",about_desc:"RythuCrop రైతులకు సులభమైన interface ను ఇప్పటికే ఉన్న ML models తో కలుపుతుంది.",
+        about_ml:"మెషిన్ లెర్నింగ్",about_ml_desc:"పంట సిఫార్సు మరియు దిగుబడి అంచనాకు ఇప్పటికే ఉన్న trained models ఉపయోగిస్తాము.",
+        about_farmer:"రైతే మొదటి ప్రాధాన్యత",about_farmer_desc:"సులభమైన ఎంపికలు మరియు స్పష్టమైన ఫలితాల కోసం రూపొందించబడింది.",
+        about_mobile:"మొబైల్‌కు అనుకూలం",about_mobile_desc:"మొబైల్, టాబ్లెట్ మరియు డెస్క్‌టాప్‌లలో సరిగ్గా పనిచేస్తుంది.",
+        footer_desc:"మెషిన్ లెర్నింగ్ ఆధారిత స్మార్ట్ వ్యవసాయం."
+    },
+    hi:{nav_home:"होम",nav_planning:"कृषि योजना",nav_crop:"फसल सुझाव",nav_yield:"उपज अनुमान",nav_advisory:"स्मार्ट सलाह",nav_about:"हमारे बारे में",
+        hero_badge:"स्मार्ट कृषि • मशीन लर्निंग",hero_title1:"स्मार्ट खेती.",hero_title2:"बेहतर फैसले.",hero_desc:"RythuCrop कृषि डेटा और मशीन लर्निंग की मदद से सही फसल चुनने और उपज का अनुमान लगाने में मदद करता है.",hero_btn1:"कृषि योजना शुरू करें →",hero_btn2:"फसल सुझाव लें",hero_card_title:"कृषि निर्णय सहायता",hero_card_main:"मिट्टी से फसल तक",hero_card_desc:"अपनी खेती की जरूरतें दर्ज करें और उपयोगी सुझाव पाएं.",
+        plan_eyebrow:"कृषि योजना",plan_title:"अपने खेत के बारे में बताएं",plan_desc:"सरल विकल्प चुनें और अपनी जरूरतों के अनुसार शुरुआती योजना पाएं.",land:"भूमि क्षेत्र (एकड़)",season:"मौसम",soil:"मिट्टी का प्रकार",irrigation:"सिंचाई",goal:"मुख्य लक्ष्य",experience:"कृषि अनुभव",generate_plan:"मेरी योजना बनाएं →",plan_result_label:"आपकी शुरुआती योजना",plan_result_title:"आपके सुझाव यहां दिखाई देंगे",plan_result_desc:"अपनी जरूरतें चुनकर योजना बनाएं.",
+        crop_eyebrow:"फसल सुझाव",crop_title:"सही फसल खोजें",crop_desc:"मौजूदा प्रशिक्षित मॉडल के लिए मिट्टी और मौसम के मान दर्ज करें.",recommend_btn:"फसल सुझाएं →",recommended:"सुझाई गई फसल",crop_result_desc:"दिए गए मिट्टी और मौसम के मान के आधार पर.",
+        yield_eyebrow:"उपज अनुमान",yield_title:"अपनी फसल की उपज का अनुमान लगाएं",yield_desc:"मौजूदा yield मॉडल के लिए कृषि जानकारी दें.",yield_btn:"उपज का अनुमान →",predicted:"अनुमानित उपज",yield_result_desc:"प्रशिक्षित मशीन लर्निंग मॉडल के आधार पर.",
+        advisory_eyebrow:"स्मार्ट सलाह",advisory_title:"अब मुझे क्या करना चाहिए?",advisory_desc:"फसल और प्राथमिकता चुनें और सरल कार्रवाई सूची पाएं.",advisory_crop:"फसल",advisory_priority:"प्राथमिकता",get_advice:"मेरी सलाह →",advice_label:"अगले कदम",
+        about_eyebrow:"RYTHUCROP के बारे में",about_title:"बेहतर कृषि फैसलों के लिए सरल तकनीक",about_desc:"RythuCrop किसान-अनुकूल interface को मौजूदा ML models से जोड़ता है.",about_ml:"मशीन लर्निंग",about_ml_desc:"फसल सुझाव और उपज अनुमान के लिए प्रशिक्षित मॉडल.",about_farmer:"किसान पहले",about_farmer_desc:"सरल विकल्प और स्पष्ट परिणाम.",about_mobile:"मोबाइल अनुकूल",about_mobile_desc:"मोबाइल, टैबलेट और डेस्कटॉप पर अनुकूलित.",footer_desc:"मशीन लर्निंग आधारित स्मार्ट कृषि."
+    },
+    ta:{nav_home:"முகப்பு",nav_planning:"விவசாய திட்டம்",nav_crop:"பயிர் பரிந்துரை",nav_yield:"மகசூல் கணிப்பு",nav_advisory:"ஸ்மார்ட் ஆலோசனை",nav_about:"பற்றி",
+        hero_badge:"ஸ்மார்ட் விவசாயம் • மெஷின் லேர்னிங்",hero_title1:"ஸ்மார்ட் விவசாயம்.",hero_title2:"சிறந்த முடிவுகள்.",hero_desc:"விவசாய தரவு மற்றும் மெஷின் லேர்னிங் மூலம் சரியான பயிரையும் மகசூலையும் தேர்வு செய்ய RythuCrop உதவுகிறது.",hero_btn1:"திட்டத்தை தொடங்கு →",hero_btn2:"பயிர் பரிந்துரை",hero_card_title:"விவசாய முடிவு உதவி",hero_card_main:"மண்ணிலிருந்து அறுவடை வரை",hero_card_desc:"உங்கள் தேவைகளை உள்ளிட்டு பயனுள்ள பரிந்துரைகளைப் பெறுங்கள்.",
+        plan_eyebrow:"விவசாய திட்டம்",plan_title:"உங்கள் பண்ணையைப் பற்றி கூறுங்கள்",plan_desc:"எளிய விருப்பங்களைத் தேர்வு செய்து தொடக்கத் திட்டத்தைப் பெறுங்கள்.",land:"நிலப்பரப்பு (ஏக்கர்)",season:"பருவம்",soil:"மண் வகை",irrigation:"நீர்ப்பாசனம்",goal:"முக்கிய நோக்கம்",experience:"விவசாய அனுபவம்",generate_plan:"என் திட்டத்தை உருவாக்கு →",plan_result_label:"உங்கள் தொடக்கத் திட்டம்",plan_result_title:"பரிந்துரைகள் இங்கே வரும்",plan_result_desc:"தேவைகளைத் தேர்வு செய்து திட்டத்தை உருவாக்குங்கள்.",
+        crop_eyebrow:"பயிர் பரிந்துரை",crop_title:"சரியான பயிரைக் கண்டறியுங்கள்",crop_desc:"மண் மற்றும் காலநிலை மதிப்புகளை உள்ளிடுங்கள்.",recommend_btn:"பயிரை பரிந்துரைக்கவும் →",recommended:"பரிந்துரைக்கப்பட்ட பயிர்",crop_result_desc:"உள்ளிட்ட மதிப்புகளின் அடிப்படையில்.",yield_eyebrow:"மகசூல் கணிப்பு",yield_title:"மகசூலை கணிக்கவும்",yield_desc:"தேவையான விவசாய தகவலை உள்ளிடுங்கள்.",yield_btn:"மகசூலை கணிக்கவும் →",predicted:"கணிக்கப்பட்ட மகசூல்",yield_result_desc:"பயிற்சி பெற்ற ML மாதிரியின் அடிப்படையில்.",
+        advisory_eyebrow:"ஸ்மார்ட் ஆலோசனை",advisory_title:"அடுத்து என்ன செய்ய வேண்டும்?",advisory_desc:"பயிர் மற்றும் முன்னுரிமையைத் தேர்ந்தெடுக்கவும்.",advisory_crop:"பயிர்",advisory_priority:"முன்னுரிமை",get_advice:"என் ஆலோசனை →",advice_label:"அடுத்த நடவடிக்கைகள்",
+        about_eyebrow:"RYTHUCROP பற்றி",about_title:"சிறந்த விவசாய முடிவுகளுக்கான எளிய தொழில்நுட்பம்",about_desc:"விவசாயிகளுக்கான எளிய interface மற்றும் ML models இணைக்கப்பட்டுள்ளது.",about_ml:"மெஷின் லேர்னிங்",about_ml_desc:"பயிர் பரிந்துரை மற்றும் மகசூல் கணிப்புக்கு பயிற்சி பெற்ற மாதிரிகள்.",about_farmer:"விவசாயி முதலில்",about_farmer_desc:"எளிய தேர்வுகள் மற்றும் தெளிவான முடிவுகள்.",about_mobile:"மொபைல் நட்பு",about_mobile_desc:"மொபைல், டேப்லெட் மற்றும் டெஸ்க்டாப்பில் இயங்கும்.",footer_desc:"மெஷின் லேர்னிங் அடிப்படையிலான ஸ்மார்ட் விவசாயம்."
+    }
+};
+translations.kn=translations.en; translations.ml=translations.en; translations.mr=translations.hi; translations.bn=translations.en;
+
+function applyLanguage(lang){
+    const t=translations[lang]||translations.en;
+    document.querySelectorAll("[data-i18n]").forEach(el=>{
+        const key=el.getAttribute("data-i18n");
+        if(t[key]) el.textContent=t[key];
+    });
+    document.documentElement.lang=lang;
+    localStorage.setItem("rythucrop-language",lang);
+}
+document.getElementById("language").addEventListener("change",e=>applyLanguage(e.target.value));
+
+const savedLang=localStorage.getItem("rythucrop-language")||"en";
+document.getElementById("language").value=savedLang;
+applyLanguage(savedLang);
+
+document.getElementById("themeBtn").addEventListener("click",()=>{
+    document.body.classList.toggle("dark");
+    const dark=document.body.classList.contains("dark");
+    document.getElementById("themeBtn").textContent=dark?"🌙":"☀️";
+    localStorage.setItem("rythucrop-theme",dark?"dark":"light");
+});
+if(localStorage.getItem("rythucrop-theme")==="dark"){
+    document.body.classList.add("dark");
+    document.getElementById("themeBtn").textContent="🌙";
+}
+
+document.getElementById("menuBtn").addEventListener("click",()=>{
+    document.getElementById("mainNav").classList.toggle("open");
+});
+
+document.querySelectorAll("#mainNav a, .hero-buttons a").forEach(a=>{
+    a.addEventListener("click",event=>{
+        const href=a.getAttribute("href");
+
+        if(href && href.startsWith("#")){
+            const target=document.querySelector(href);
+
+            if(target){
+                event.preventDefault();
+
+                const navbar=document.querySelector(".navbar");
+                const navbarHeight=navbar ? navbar.offsetHeight : 0;
+
+                document.documentElement.style.setProperty(
+                    "--actual-navbar-height",
+                    navbarHeight + "px"
+                );
+
+                const top=
+                    target.getBoundingClientRect().top +
+                    window.scrollY -
+                    navbarHeight;
+
+                window.scrollTo({
+                    top:Math.max(0,top),
+                    behavior:"smooth"
+                });
+
+                history.replaceState(null,"",href);
+            }
+        }
+
+        document.getElementById("mainNav").classList.remove("open");
+    });
+});
+
+/* Keep the CSS offset synchronized with the real two-row navbar. */
+function syncNavbarHeight(){
+    const navbar=document.querySelector(".navbar");
+    if(!navbar) return;
+
+    const height=navbar.offsetHeight;
+
+    document.documentElement.style.setProperty(
+        "--actual-navbar-height",
+        height + "px"
+    );
+}
+
+syncNavbarHeight();
+window.addEventListener("load",syncNavbarHeight);
+window.addEventListener("resize",syncNavbarHeight);
+
+/* Farm planning: simple requirement-to-action guidance. */
+document.getElementById("planningForm").addEventListener("submit",e=>{
+    e.preventDefault();
+    const land=Number(document.getElementById("land").value);
+    const season=document.getElementById("season").value;
+    const soil=document.getElementById("soil").value;
+    const irrigation=document.getElementById("irrigation").value;
+    const goal=document.getElementById("goal").value;
+    const experience=document.getElementById("experience").value;
+
+    let crop="Rice";
+    if(irrigation.includes("Low") || irrigation==="Rainfed") crop="Millets / Groundnut";
+    else if(soil==="Black Soil") crop="Cotton / Maize";
+    else if(soil==="Red Soil") crop="Groundnut / Maize";
+
+    const actions=[
+        `Suggested starting crop group: ${crop}`,
+        `Season selected: ${season}. Verify local sowing window before planting.`,
+        `Water plan: ${irrigation}. Prefer efficient irrigation when water is limited.`,
+        `Main goal: ${goal}. Keep input use aligned with soil test results.`,
+        `Land size: ${land} acre(s). Plan seed, fertilizer and irrigation quantities according to actual field size.`,
+        `Experience: ${experience}. Use the Crop Recommendation section for model-based crop selection.`
+    ];
+
+    document.getElementById("planTitle").textContent="Plan generated";
+    document.getElementById("planSummary").textContent="These are decision-support suggestions. Confirm local agronomy requirements before applying inputs.";
+    document.getElementById("planResults").innerHTML=actions.map(x=>`<div class="recommendation-item">✓ ${x}</div>`).join("");
+});
+
+/* Existing crop recommendation backend connection is preserved. */
+document.getElementById("cropForm").addEventListener("submit",async function(event){
+    event.preventDefault();
+    const resultBox=document.getElementById("cropResult");
+    const result=document.getElementById("recommendedCrop");
+    const data={
+        N:parseFloat(document.getElementById("N").value),
+        P:parseFloat(document.getElementById("P").value),
+        K:parseFloat(document.getElementById("K").value),
+        temperature:parseFloat(document.getElementById("temperature").value),
+        humidity:parseFloat(document.getElementById("humidity").value),
+        ph:parseFloat(document.getElementById("ph").value),
+        rainfall:parseFloat(document.getElementById("rainfall").value)
+    };
+    resultBox.classList.remove("hidden");
+    result.textContent="Calculating...";
+    try{
+        const response=await fetch("/predict",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify(data)
+        });
+        const output=await response.json();
+        if(output.recommended_crop) result.textContent=output.recommended_crop;
+        else result.textContent="Prediction failed";
+    }catch(error){
+        result.textContent="Server error";
+        console.error(error);
+    }
+});
+
+/* Existing yield prediction backend connection is preserved. */
+document.getElementById("yieldForm").addEventListener("submit",async function(event){
+    event.preventDefault();
+    const resultBox=document.getElementById("yieldResult");
+    const result=document.getElementById("predictedYield");
+    const data={
+        Crop:document.getElementById("Crop").value,
+        Crop_Year:Number(document.getElementById("Crop_Year").value),
+        Season:document.getElementById("Season").value,
+        State:document.getElementById("State").value,
+        Area:Number(document.getElementById("Area").value),
+        Production:Number(document.getElementById("Production").value),
+        Annual_Rainfall:Number(document.getElementById("Annual_Rainfall").value),
+        Fertilizer:Number(document.getElementById("Fertilizer").value),
+        Pesticide:Number(document.getElementById("Pesticide").value)
+    };
+    resultBox.classList.remove("hidden");
+    result.textContent="Calculating...";
+    try{
+        const response=await fetch("/predict-yield",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify(data)
+        });
+        const output=await response.json();
+        if(output.predicted_yield!==undefined)
+            result.textContent=Number(output.predicted_yield).toFixed(2)+" tonnes/ha";
+        else result.textContent="Prediction failed";
+    }catch(error){
+        result.textContent="Server error";
+        console.error(error);
+    }
+});
+
+/* Smart advisory. */
+document.getElementById("adviceBtn").addEventListener("click",()=>{
+    const crop=document.getElementById("adCrop").value;
+    const priority=document.getElementById("adPriority").value;
+    const title=document.getElementById("adviceTitle");
+    const list=document.getElementById("adviceList");
+
+    const common=[
+        `Check crop growth and field conditions regularly for ${crop}.`,
+        "Use soil-test information before changing fertilizer quantities.",
+        "Record important farm observations so future decisions can be compared."
+    ];
+    const priorityAdvice={
+        "Water saving":"Use irrigation according to crop stage and avoid unnecessary watering.",
+        "Fertilizer management":"Prefer balanced nutrient application based on soil condition and crop requirement.",
+        "Pest prevention":"Inspect leaves and crop rows early; act according to a verified local recommendation.",
+        "Higher yield":"Focus on timely sowing, adequate nutrition, irrigation and regular field monitoring."
+    };
+    title.textContent=`${crop} • ${priority}`;
+    list.innerHTML=[priorityAdvice[priority],...common].map(x=>`<div class="recommendation-item">✓ ${x}</div>`).join("");
+});
+</script>
+</body>
+</html>
+

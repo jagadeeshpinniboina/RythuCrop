@@ -1,0 +1,1510 @@
+/* =========================================================
+   RYTHUCROP — PREMIUM ONE PAGE WEBSITE
+   ========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f6faf7;
+    color: #1f2937;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   NAVBAR
+   ========================================================= */
+
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    height: 72px;
+    background: rgba(255, 255, 255, 0.96);
+    border-bottom: 1px solid #e5e7eb;
+
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.nav-container {
+    width: 90%;
+    max-width: 1180px;
+    height: 100%;
+    margin: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    color: #14532d;
+    text-decoration: none;
+
+    font-size: 21px;
+    font-weight: 750;
+}
+
+.brand-icon {
+    font-size: 26px;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+nav a {
+    color: #4b5563;
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    transition: 0.2s ease;
+}
+
+nav a:hover {
+    color: #15803d;
+}
+
+
+/* =========================================================
+   HOME / HERO
+   ========================================================= */
+
+.home-section {
+    min-height: 620px;
+
+    width: 90%;
+    max-width: 1180px;
+    margin: auto;
+
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: center;
+    gap: 50px;
+
+    padding: 70px 0;
+}
+
+.home-content {
+    max-width: 650px;
+}
+
+.hero-badge {
+    display: inline-block;
+
+    padding: 7px 15px;
+
+    border-radius: 30px;
+
+    background: #dcfce7;
+    color: #166534;
+
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.3px;
+
+    margin-bottom: 18px;
+}
+
+.home-content h1 {
+    font-size: 58px;
+    line-height: 1.08;
+
+    color: #123d24;
+
+    font-weight: 800;
+
+    margin-bottom: 22px;
+}
+
+.home-content h1 span {
+    color: #16a34a;
+}
+
+.home-content > p {
+    max-width: 600px;
+
+    color: #64748b;
+
+    font-size: 17px;
+    line-height: 1.8;
+
+    margin-bottom: 30px;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.hero-buttons {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.primary-button,
+.secondary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 48px;
+
+    padding: 0 22px;
+
+    border-radius: 9px;
+
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+.primary-button {
+    border: none;
+
+    background: #15803d;
+    color: #ffffff;
+
+    box-shadow: 0 7px 18px rgba(21, 128, 61, 0.22);
+}
+
+.primary-button:hover {
+    background: #166534;
+    transform: translateY(-2px);
+}
+
+.secondary-button {
+    border: 1px solid #bbf7d0;
+
+    background: #ffffff;
+    color: #166534;
+}
+
+.secondary-button:hover {
+    background: #f0fdf4;
+    transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   HERO VISUAL
+   ========================================================= */
+
+.hero-visual {
+    min-height: 390px;
+
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-circle {
+    width: 340px;
+    height: 340px;
+
+    border-radius: 50%;
+    overflow: hidden;
+
+    background: transparent;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none;
+
+}
+
+.hero-circle img {
+    width: 100%;
+    height: 100%;
+    display: block;
+
+    object-fit: contain;
+    object-position: center;
+
+    border-radius: 50%;
+}
+
+.hero-small-card {
+    position: absolute;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 11px;
+
+    padding: 13px 17px;
+
+    color: #374151;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.card-one {
+    top: 45px;
+    right: 0;
+}
+
+.card-two {
+    bottom: 45px;
+    left: 5px;
+}
+
+
+/* =========================================================
+   SECTIONS
+   ========================================================= */
+
+.features-section,
+.tool-section,
+.about-section {
+    width: 90%;
+    max-width: 1180px;
+
+    margin: auto;
+
+    padding: 85px 0;
+}
+
+.features-section {
+    border-top: 1px solid #e5e7eb;
+}
+
+.section-heading {
+    text-align: center;
+
+    max-width: 700px;
+
+    margin: 0 auto 45px;
+}
+
+.section-heading > span {
+    color: #15803d;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+}
+
+.section-heading h2 {
+    margin-top: 10px;
+
+    color: #14532d;
+
+    font-size: 34px;
+    line-height: 1.25;
+}
+
+.section-heading p {
+    margin-top: 12px;
+
+    color: #6b7280;
+
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   FEATURE CARDS
+   ========================================================= */
+
+.feature-grid {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 22px;
+}
+
+.feature-card,
+.about-card {
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 15px;
+
+    padding: 28px;
+
+    box-shadow:
+        0 8px 25px rgba(15, 23, 42, 0.05);
+
+    transition: 0.25s ease;
+}
+
+.feature-card:hover,
+.about-card:hover {
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 15px 35px rgba(15, 23, 42, 0.09);
+}
+
+.feature-icon {
+    width: 50px;
+    height: 50px;
+
+    border-radius: 12px;
+
+    background: #ecfdf5;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 24px;
+
+    margin-bottom: 18px;
+}
+
+.feature-card h3,
+.about-card h3 {
+    color: #14532d;
+
+    font-size: 18px;
+
+    margin-bottom: 9px;
+}
+
+.feature-card p,
+.about-card p {
+    color: #6b7280;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+
+    margin-bottom: 18px;
+}
+
+.feature-card a {
+    color: #15803d;
+
+    text-decoration: none;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   TOOL SECTIONS
+   ========================================================= */
+
+.tool-section {
+    border-top: 1px solid #e5e7eb;
+}
+
+.yield-section {
+    background: #f0fdf4;
+
+    width: 100%;
+    max-width: none;
+
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+.tool-card {
+    width: 100%;
+    max-width: 1000px;
+
+    margin: auto;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 18px;
+
+    padding: 38px;
+
+    box-shadow:
+        0 12px 35px rgba(15, 23, 42, 0.07);
+}
+
+
+/* =========================================================
+   FORMS
+   ========================================================= */
+
+.form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 22px 26px;
+}
+
+.form-group {
+    display: flex;
+
+    flex-direction: column;
+}
+
+.form-group label {
+    color: #374151;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    margin-bottom: 8px;
+}
+
+.form-group label span {
+    color: #9ca3af;
+
+    font-size: 12px;
+
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    height: 48px;
+
+    padding: 0 14px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    color: #111827;
+
+    font-size: 14px;
+
+    transition: 0.2s ease;
+}
+
+.form-group input::placeholder {
+    color: #9ca3af;
+}
+
+.form-group input:hover {
+    border-color: #9ca3af;
+}
+
+.form-group input:focus {
+    outline: none;
+
+    border-color: #16a34a;
+
+    box-shadow:
+        0 0 0 3px rgba(22, 163, 74, 0.10);
+}
+
+.form-action {
+    grid-column: 1 / -1;
+
+    text-align: center;
+
+    padding-top: 10px;
+}
+
+
+/* =========================================================
+   RESULT
+   ========================================================= */
+
+.result-box {
+    margin-top: 28px;
+
+    padding: 22px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 17px;
+
+    border-radius: 13px;
+
+    background: #f0fdf4;
+
+    border: 1px solid #bbf7d0;
+}
+
+.result-icon {
+    width: 52px;
+    height: 52px;
+
+    flex-shrink: 0;
+
+    border-radius: 12px;
+
+    background: #dcfce7;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 24px;
+}
+
+.result-box span {
+    color: #15803d;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.2px;
+}
+
+.result-box h3 {
+    color: #14532d;
+
+    font-size: 28px;
+
+    margin: 3px 0;
+}
+
+.result-box p {
+    color: #6b7280;
+
+    font-size: 12px;
+}
+
+.hidden {
+    display: none;
+}
+
+
+/* =========================================================
+   ABOUT
+   ========================================================= */
+
+.about-section {
+    border-top: 1px solid #e5e7eb;
+}
+
+.about-grid {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 22px;
+}
+
+.technology-box {
+    margin: 35px auto 0;
+
+    max-width: 850px;
+
+    padding: 22px;
+
+    text-align: center;
+
+    border-radius: 13px;
+
+    background: #ecfdf5;
+
+    border: 1px solid #bbf7d0;
+}
+
+.technology-box span {
+    color: #15803d;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.3px;
+}
+
+.technology-box p {
+    color: #4b5563;
+
+    margin-top: 7px;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+footer {
+    background: #123d24;
+
+    color: #d1fae5;
+
+    padding: 28px 0;
+}
+
+.footer-container {
+    width: 90%;
+    max-width: 1180px;
+
+    margin: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+.footer-container strong {
+    font-size: 15px;
+}
+
+.footer-container p {
+    color: #a7f3d0;
+
+    font-size: 12px;
+
+    margin-top: 4px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .home-section {
+        grid-template-columns: 1fr;
+
+        text-align: center;
+
+        padding: 55px 0;
+    }
+
+    .home-content {
+        margin: auto;
+    }
+
+    .home-content > p {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-buttons {
+        justify-content: center;
+    }
+
+    .hero-visual {
+        min-height: 330px;
+    }
+
+    .feature-grid,
+    .about-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .navbar {
+        position: relative;
+
+        height: auto;
+
+        padding: 18px 0;
+    }
+
+    .nav-container {
+        flex-direction: column;
+
+        gap: 15px;
+    }
+
+    nav {
+        flex-wrap: wrap;
+
+        justify-content: center;
+
+        gap: 15px;
+    }
+
+    .home-content h1 {
+        font-size: 42px;
+    }
+
+    .hero-circle {
+        width: 240px;
+        height: 240px;
+    }
+
+    .card-one {
+        right: -5px;
+    }
+
+    .card-two {
+        left: -5px;
+    }
+
+    .tool-card {
+        padding: 24px 18px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-action {
+        grid-column: 1;
+    }
+
+    .yield-section {
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+
+    .section-heading h2 {
+        font-size: 28px;
+    }
+
+    .footer-container {
+        flex-direction: column;
+
+        text-align: center;
+    }
+}
+
+/* ===== HIDE HERO SMALL CARDS ===== */
+
+.hero-small-card {
+    display: none !important;
+}
+
+.card-one,
+.card-two {
+    display: none !important;
+}
+/* ===== NAVBAR PROFESSIONAL STYLE ===== */
+
+.navbar {
+    background: linear-gradient(90deg, #e8f5e9, #ffffff, #e0f2f1);
+    border-bottom: 1px solid #c8e6c9;
+    box-shadow: 0 3px 15px rgba(22, 101, 52, 0.10);
+}
+
+/* Navigation links */
+
+.navbar nav a {
+    position: relative;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+/* Hover animation */
+
+.navbar nav a:hover {
+    color: #16805c;
+    transform: translateY(-2px);
+}
+
+/* Animated underline */
+
+.navbar nav a::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -8px;
+    width: 0;
+    height: 3px;
+    background: #16805c;
+    border-radius: 10px;
+    transform: translateX(-50%);
+    transition: width 0.3s ease;
+}
+
+.navbar nav a:hover::after {
+    width: 70%;
+}
+
+/* Active/current feeling */
+
+.navbar nav a:active {
+    transform: scale(0.96);
+}
+/* =========================================================
+   PREMIUM RYTHUCROP HOME PAGE
+   ========================================================= */
+
+/* Main page background */
+body {
+    background:
+        radial-gradient(circle at 85% 25%, rgba(74, 222, 128, 0.16), transparent 30%),
+        radial-gradient(circle at 10% 80%, rgba(45, 212, 191, 0.12), transparent 30%),
+        linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 45%, #f0fdfa 100%);
+}
+
+/* Premium navbar */
+.navbar {
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(22, 101, 52, 0.12);
+    box-shadow: 0 8px 30px rgba(20, 83, 45, 0.08);
+}
+
+/* Hero section */
+.hero-section {
+    position: relative;
+    background:
+        radial-gradient(circle at 80% 45%, rgba(34, 197, 94, 0.16), transparent 30%),
+        linear-gradient(135deg, #ecfdf5, #f0fdfa 55%, #e0f2f1);
+    border-radius: 0 0 40px 40px;
+    overflow: hidden;
+}
+
+/* Decorative premium glow */
+.hero-section::before {
+    content: "";
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    background: rgba(34, 197, 94, 0.08);
+    top: -180px;
+    right: -120px;
+    filter: blur(10px);
+}
+
+.hero-section::after {
+    content: "";
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: rgba(20, 184, 166, 0.07);
+    bottom: -160px;
+    left: -100px;
+    filter: blur(8px);
+}
+
+/* Hero text */
+.hero-section h1 {
+    letter-spacing: -1px;
+    line-height: 1.08;
+    text-shadow: 0 4px 20px rgba(20, 83, 45, 0.08);
+}
+
+/* Paragraph */
+.hero-section p {
+    color: #527064;
+    line-height: 1.8;
+}
+
+/* Premium hero image area */
+.hero-visual {
+    position: relative;
+}
+
+/* Farmer image circle */
+.hero-circle {
+    box-shadow:
+        0 25px 60px rgba(22, 101, 52, 0.18),
+        0 0 0 12px rgba(255, 255, 255, 0.55);
+    transition: transform 0.45s ease, box-shadow 0.45s ease;
+}
+
+.hero-circle:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow:
+        0 35px 75px rgba(22, 101, 52, 0.24),
+        0 0 0 14px rgba(255, 255, 255, 0.65);
+}
+
+/* Primary button */
+.hero-section .btn,
+.hero-section button {
+    transition: all 0.3s ease;
+}
+
+.hero-section .btn:hover,
+.hero-section button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(22, 101, 52, 0.22);
+}
+
+/* Navigation hover */
+.navbar nav a {
+    transition: all 0.25s ease;
+}
+
+.navbar nav a:hover {
+    color: #16805c;
+    transform: translateY(-2px);
+}
+
+/* Smooth page feel */
+html {
+    scroll-behavior: smooth;
+}
+/* ===== PREMIUM LIGHT GREEN NAVBAR ===== */
+
+.navbar {
+    background: linear-gradient(
+        90deg,
+        #dff3e4 0%,
+        #eaf7e8 45%,
+        #d8efe0 100%
+    );
+
+    border-bottom: 1px solid #b8d9c0;
+
+    box-shadow:
+        0 4px 18px rgba(40, 100, 60, 0.12);
+
+    position: relative;
+    z-index: 1000;
+}
+
+
+/* Navigation links */
+
+.navbar nav a {
+    position: relative;
+
+    color: #24543a;
+
+    font-weight: 600;
+
+    transition:
+        color 0.3s ease,
+        transform 0.3s ease;
+}
+
+
+/* Hover animation */
+
+.navbar nav a:hover {
+    color: #16805c;
+
+    transform: translateY(-2px);
+}
+
+
+/* Animated underline */
+
+.navbar nav a::after {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    bottom: -8px;
+
+    width: 0;
+    height: 3px;
+
+    background: linear-gradient(
+        90deg,
+        #16805c,
+        #55a96f
+    );
+
+    border-radius: 10px;
+
+    transform: translateX(-50%);
+
+    transition: width 0.3s ease;
+}
+
+
+.navbar nav a:hover::after {
+    width: 70%;
+}
+
+
+/* Click effect */
+
+.navbar nav a:active {
+    transform: scale(0.96);
+}
+
+
+/* ===== BRAND ===== */
+
+.navbar .brand {
+    color: #194d34 !important;
+
+    font-weight: 700;
+
+    transition: transform 0.3s ease;
+}
+
+.navbar .brand:hover {
+    transform: translateY(-2px);
+}
+
+
+/* ===== BRAND ICON ===== */
+
+.navbar .brand-icon {
+    color: #3f8f5b;
+}
+
+
+/* ===== FARMER IMAGE AREA ===== */
+
+.hero-section {
+    position: relative;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(241, 248, 237, 0.96),
+            rgba(235, 246, 231, 0.82)
+        );
+
+    overflow: hidden;
+}
+
+
+/* Soft agricultural field background */
+
+.hero-section::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(220, 239, 216, 0.25),
+            rgba(137, 177, 106, 0.18)
+        );
+
+    z-index: 0;
+
+    pointer-events: none;
+}
+
+
+/* Keep hero content above background */
+
+.hero-section > * {
+    position: relative;
+    z-index: 1;
+}
+
+
+/* ===== FARMER IMAGE CIRCLE ===== */
+
+.hero-circle {
+    position: relative;
+
+    overflow: hidden;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            145deg,
+            #dcefd5,
+            #b8d8a8
+        );
+
+    box-shadow:
+        0 0 0 7px rgba(91, 145, 79, 0.12),
+        0 18px 45px rgba(45, 95, 55, 0.20);
+}
+
+
+/* Agricultural field behind farmer image */
+
+.hero-circle::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(151, 190, 128, 0.30),
+            rgba(76, 135, 72, 0.18)
+        );
+
+    z-index: 0;
+
+    pointer-events: none;
+}
+
+
+/* Farmer image */
+
+.hero-circle img {
+    position: relative;
+
+    z-index: 1;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    object-position: center;
+
+    border-radius: 50%;
+
+    display: block;
+}
+/* ===== PREMIUM CAPABILITY CARDS ===== */
+
+.capabilities-grid .capability-card {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(
+        145deg,
+        rgba(255,255,255,0.96),
+        rgba(235,248,240,0.92)
+    );
+    border: 1px solid rgba(22, 128, 92, 0.14);
+    border-radius: 22px;
+    box-shadow:
+        0 10px 30px rgba(20, 80, 55, 0.10),
+        inset 0 1px 0 rgba(255,255,255,0.8);
+
+    transition:
+        transform 0.4s ease,
+        box-shadow 0.4s ease,
+        border-color 0.4s ease;
+}
+
+/* Soft green light inside card */
+
+.capabilities-grid .capability-card::before {
+    content: "";
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    top: -90px;
+    right: -70px;
+    background: rgba(45, 180, 120, 0.10);
+    border-radius: 50%;
+    transition: transform 0.5s ease;
+}
+
+/* Premium hover */
+
+.capabilities-grid .capability-card:hover {
+    transform: translateY(-10px);
+    border-color: rgba(22, 128, 92, 0.35);
+    box-shadow:
+        0 20px 45px rgba(20, 100, 70, 0.18),
+        0 0 25px rgba(45, 180, 120, 0.10);
+}
+
+.capabilities-grid .capability-card:hover::before {
+    transform: scale(1.6);
+}
+
+/* Icons */
+
+.capabilities-grid .capability-card .icon,
+.capabilities-grid .capability-card .card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 58px;
+    height: 58px;
+
+    margin-bottom: 22px;
+
+    border-radius: 16px;
+
+    background: linear-gradient(
+        135deg,
+        #e0f7e9,
+        #c7eed8
+    );
+
+    color: #087f5b;
+
+    font-size: 30px;
+
+    box-shadow:
+        0 8px 20px rgba(20, 120, 80, 0.12);
+
+    transition:
+        transform 0.4s ease,
+        box-shadow 0.4s ease;
+}
+
+/* Icon animation */
+
+.capabilities-grid .capability-card:hover .icon,
+.capabilities-grid .capability-card:hover .card-icon {
+    transform: translateY(-5px) rotate(-4deg) scale(1.08);
+
+    box-shadow:
+        0 12px 28px rgba(20, 120, 80, 0.20);
+}
+
+/* Card title */
+
+.capabilities-grid .capability-card h3 {
+    color: #123d32;
+    transition: color 0.3s ease;
+}
+
+.capabilities-grid .capability-card:hover h3 {
+    color: #087f5b;
+}
+
+/* Card description */
+
+.capabilities-grid .capability-card p {
+    color: #5f746d;
+}
+
+/* Links */
+
+.capabilities-grid .capability-card a {
+    color: #087f5b;
+    font-weight: 700;
+    transition:
+        color 0.3s ease,
+        transform 0.3s ease;
+}
+
+.capabilities-grid .capability-card a:hover {
+    color: #045c42;
+    transform: translateX(5px);
+    position:relative;
+}
+
+/* ===== PAGE SCROLL FIX ===== */
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* Keep every page content visible */
+main,
+.page,
+.page-container,
+.content,
+.container {
+    min-height: auto;
+    height: auto;
+    overflow: visible;
+}
+
+/* Prevent sections from being cut */
+section {
+    height: auto;
+    min-height: auto;
+    overflow: visible;
+}
+
+/* Proper spacing at bottom */
+footer {
+    margin-top: 60px;
+}
+
+
+/* =========================================================
+   FINAL RYTHUCROP FIXES
+   - Keep navbar sticky on desktop
+   - Allow every page to scroll naturally
+   - Prevent content clipping
+   - Keep mobile navigation usable
+   - Avoid accidental horizontal overflow
+   ========================================================= */
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 82px;
+}
+
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* Navbar must remain available while scrolling */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Do not force page wrappers/sections to a viewport height */
+main,
+.page,
+.page-container,
+.content,
+.container,
+section {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+}
+
+/* Main sections can still define their own minimum height */
+.home-section {
+    min-height: 620px;
+}
+
+/* Forms/results must never be clipped */
+.tool-section,
+.tool-card,
+.form-grid,
+.result-box,
+.about-section,
+.about-grid {
+    overflow: visible;
+}
+
+/* Keep footer in normal document flow */
+footer {
+    margin-top: 60px;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .navbar {
+        position: relative;
+        height: auto;
+    }
+
+    body {
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .nav-container {
+        width: 92%;
+    }
+
+    nav {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .home-section {
+        min-height: auto;
+    }
+}
+
+/* =========================================
+   RYTHUCROP - FINAL LAPTOP SIZE ADJUSTMENT
+   ========================================= */
+
+@media (min-width: 1000px) {
+
+    /* Main section */zz
+    #planning,
+    #recommendation,
+    #yield,
+    #advisory,
+    #about {
+        padding: 48px 6vw !important;
+    }
+
+    /* Section heading */
+    .section-heading {
+        margin-bottom: 24px !important;
+    }
+
+    .section-heading h2 {
+        font-size: clamp(32px, 3vw, 48px) !important;
+        line-height: 1.1 !important;
+        margin-bottom: 12px !important;
+    }
+
+    .section-heading p {
+        font-size: 16px !important;
+        line-height: 1.5 !important;
+        max-width: 750px !important;
+    }
+
+    /* Form/content area */
+    .form-card,
+    .planning-card,
+    .recommendation-card,
+    .yield-card,
+    .advisory-card {
+        font-size: 16px;
+    }
+
+    /* Labels */
+    label {
+        font-size: 15px !important;
+    }
+
+    /* Inputs and selects */
+    input,
+    select {
+        min-height: 46px !important;
+        font-size: 15px !important;
+    }
+
+    /* Buttons */
+    button {
+        min-height: 44px !important;
+        padding: 10px 20px !important;
+        font-size: 15px !important;
+    }
+
+    /* About cards */
+    .about-grid {
+        gap: 28px !important;
+    }
+
+    .about-card {
+        padding: 24px !important;
+    }
+
+    .about-card h3 {
+        font-size: 20px !important;
+    }
+
+    .about-card p {
+        font-size: 15px !important;
+        line-height: 1.5 !important;
+    }
+}

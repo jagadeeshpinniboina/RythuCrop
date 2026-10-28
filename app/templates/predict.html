@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Crop Yield Prediction | Smart Agriculture</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<header class="navbar">
+    <div class="nav-container">
+
+        <a href="/" class="brand">
+            <span class="brand-icon">🌱</span>
+            <span>RythuCrop</span>
+        </a>
+
+        <nav>
+            <a href="/">Home</a>
+            <a href="/predict/" class="active">Prediction</a>
+            <a href="/about">About</a>
+        </nav>
+
+    </div>
+</header>
+
+
+<!-- ================= HERO ================= -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <span class="hero-badge">
+            SMART AGRICULTURE
+        </span>
+
+        <h1>
+            Crop Yield Prediction
+        </h1>
+
+        <p>
+            Predict agricultural yield using machine learning
+            based on crop, climate and farming parameters.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="container">
+
+    <section class="prediction-card">
+
+        <div class="card-header">
+
+            <div>
+                <h2>Agricultural Parameters</h2>
+                <p>
+                    Enter the required details to generate a yield prediction.
+                </p>
+            </div>
+
+            <div class="card-icon">
+                🌾
+            </div>
+
+        </div>
+
+
+        <form id="yieldForm">
+
+            <!-- Crop -->
+            <div class="form-group">
+
+                <label for="Crop">
+                    Crop
+                </label>
+
+                <input
+                    type="text"
+                    id="Crop"
+                    placeholder="e.g. Rice"
+                    required
+                >
+
+                <small>Enter the crop name</small>
+
+            </div>
+
+
+            <!-- Crop Year -->
+            <div class="form-group">
+
+                <label for="Crop_Year">
+                    Crop Year
+                </label>
+
+                <input
+                    type="number"
+                    id="Crop_Year"
+                    placeholder="e.g. 2024"
+                    min="1900"
+                    max="2100"
+                    required
+                >
+
+                <small>Year of cultivation</small>
+
+            </div>
+
+
+            <!-- Season -->
+            <div class="form-group">
+
+                <label for="Season">
+                    Season
+                </label>
+
+                <input
+                    type="text"
+                    id="Season"
+                    placeholder="e.g. Kharif"
+                    required
+                >
+
+                <small>Enter the cultivation season</small>
+
+            </div>
+
+
+            <!-- State -->
+            <div class="form-group">
+
+                <label for="State">
+                    State
+                </label>
+
+                <input
+                    type="text"
+                    id="State"
+                    placeholder="e.g. Andhra Pradesh"
+                    required
+                >
+
+                <small>State where crop is cultivated</small>
+
+            </div>
+
+
+            <!-- Area -->
+            <div class="form-group">
+
+                <label for="Area">
+                    Area
+                    <span>(hectares)</span>
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="Area"
+                    placeholder="e.g. 100"
+                    required
+                >
+
+                <small>Total cultivated area</small>
+
+            </div>
+
+
+            <!-- Production -->
+            <div class="form-group">
+
+                <label for="Production">
+                    Production
+                    <span>(tonnes)</span>
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="Production"
+                    placeholder="e.g. 500"
+                    required
+                >
+
+                <small>Expected agricultural production</small>
+
+            </div>
+
+
+            <!-- Rainfall -->
+            <div class="form-group">
+
+                <label for="Annual_Rainfall">
+                    Annual Rainfall
+                    <span>(mm)</span>
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="Annual_Rainfall"
+                    placeholder="e.g. 1200"
+                    required
+                >
+
+                <small>Annual rainfall measurement</small>
+
+            </div>
+
+
+            <!-- Fertilizer -->
+            <div class="form-group">
+
+                <label for="Fertilizer">
+                    Fertilizer
+                    <span>(kg)</span>
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="Fertilizer"
+                    placeholder="e.g. 500"
+                    required
+                >
+
+                <small>Amount of fertilizer used</small>
+
+            </div>
+
+
+            <!-- Pesticide -->
+            <div class="form-group">
+
+                <label for="Pesticide">
+                    Pesticide
+                    <span>(kg)</span>
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="Pesticide"
+                    placeholder="e.g. 50"
+                    required
+                >
+
+                <small>Amount of pesticide used</small>
+
+            </div>
+
+
+            <!-- Button -->
+
+            <div class="form-actions">
+
+                <button type="submit" id="predictButton">
+
+                    <span>Predict Crop Yield</span>
+                    <span class="arrow">→</span>
+
+                </button>
+
+                <p>
+                    Your prediction will be generated using the trained
+                    machine learning model.
+                </p>
+
+            </div>
+
+        </form>
+
+
+        <!-- ================= RESULT ================= -->
+
+        <div id="result" class="result-box hidden">
+
+            <div class="result-icon">
+                🌾
+            </div>
+
+            <div>
+                <span class="result-label">
+                    PREDICTED CROP YIELD
+                </span>
+
+                <h2 id="resultValue">
+                    --
+                </h2>
+
+                <p>
+                    Prediction generated successfully using the
+                    machine learning model.
+                </p>
+            </div>
+
+        </div>
+
+
+    </section>
+
+</main>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    <div class="footer-container">
+
+        <div>
+            <strong>🌱 RythuCrop</strong>
+            <p>
+                Machine Learning Based Crop Yield Prediction
+            </p>
+        </div>
+
+        <div>
+            <p>Smart Agriculture • Data Driven Farming</p>
+        </div>
+
+    </div>
+
+</footer>
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+document
+    .getElementById("yieldForm")
+    .addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        const data = {
+
+            Crop:
+                document.getElementById("Crop").value,
+
+            Crop_Year:
+                Number(document.getElementById("Crop_Year").value),
+
+            Season:
+                document.getElementById("Season").value,
+
+            State:
+                document.getElementById("State").value,
+
+            Area:
+                Number(document.getElementById("Area").value),
+
+            Production:
+                Number(document.getElementById("Production").value),
+
+            Annual_Rainfall:
+                Number(
+                    document.getElementById("Annual_Rainfall").value
+                ),
+
+            Fertilizer:
+                Number(
+                    document.getElementById("Fertilizer").value
+                ),
+
+            Pesticide:
+                Number(
+                    document.getElementById("Pesticide").value
+                )
+        };
+
+
+        const resultBox =
+            document.getElementById("result");
+
+        const resultValue =
+            document.getElementById("resultValue");
+
+        const button =
+            document.getElementById("predictButton");
+
+
+        button.disabled = true;
+
+        button.querySelector("span:first-child")
+            .textContent = "Predicting...";
+
+
+        resultBox.classList.remove("hidden");
+
+        resultValue.textContent = "Calculating...";
+
+
+        try {
+
+            const response = await fetch(
+                "/predict-yield",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify(data)
+                }
+            );
+
+
+            const result =
+                await response.json();
+
+
+            if (
+                result.predicted_yield !== undefined
+            ) {
+
+                const value =
+                    Number(
+                        result.predicted_yield
+                    ).toFixed(2);
+
+                resultValue.textContent =
+                    value;
+
+            } else {
+
+                resultValue.textContent =
+                    "Prediction failed";
+
+                console.error(
+                    result.error
+                );
+            }
+
+
+        } catch (error) {
+
+            resultValue.textContent =
+                "Server error";
+
+            console.error(error);
+
+        }
+
+
+        button.disabled = false;
+
+        button.querySelector("span:first-child")
+            .textContent = "Predict Crop Yield";
+
+    });
+
+</script>
+
+</body>
+</html>

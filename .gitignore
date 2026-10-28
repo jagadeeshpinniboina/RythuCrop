@@ -1,0 +1,6 @@
+venv/
+*.pyc
+__pycache__/
+Crop-Yield-Prediction-Backup/
+app_backup/
+.system_generated/

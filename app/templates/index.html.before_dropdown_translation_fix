@@ -1,0 +1,1449 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RythuCrop | Smart Agriculture</title>
+
+    <style>
+        :root{
+            --green:#087f5b;
+            --green-dark:#075c43;
+            --green-soft:#eaf7f1;
+            --accent:#f4a340;
+            --text:#17352b;
+            --muted:#61756d;
+            --card:#ffffff;
+            --bg:#f7fbf8;
+            --border:#dcebe4;
+            --shadow:0 18px 50px rgba(17,70,52,.10);
+        }
+
+        *{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth}
+        body{
+            font-family:Arial,Helvetica,sans-serif;
+            background:var(--bg);
+            color:var(--text);
+            line-height:1.6;
+        }
+        body.dark{
+            --text:#edf8f2;
+            --muted:#b5c8c0;
+            --card:#12352a;
+            --bg:#071c15;
+            --border:#285044;
+            --green-soft:#123e31;
+            --shadow:0 18px 50px rgba(0,0,0,.25);
+        }
+        a{text-decoration:none;color:inherit}
+        button,input,select{font:inherit}
+        button{cursor:pointer}
+
+        .navbar{
+            position:sticky;
+            top:0;
+            z-index:1000;
+            background:rgba(255,255,255,.94);
+            backdrop-filter:blur(14px);
+            border-bottom:1px solid var(--border);
+        }
+        body.dark .navbar{background:rgba(7,28,21,.94)}
+        .nav-container{
+            max-width:1250px;
+            margin:auto;
+            padding:14px 24px 10px;
+        }
+        .nav-main{
+            min-height:58px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:20px;
+        }
+        .brand{display:flex;align-items:center;gap:10px;font-size:21px;font-weight:800}
+        .brand-icon{
+            width:40px;height:40px;border-radius:50%;
+            display:grid;place-items:center;
+            background:var(--green);color:white;
+        }
+        nav{display:flex;align-items:center;gap:25px}
+        nav a{font-size:14px;font-weight:700;color:var(--muted)}
+        nav a:hover,nav a.active{color:var(--green)}
+        .nav-controls{
+            display:flex;
+            justify-content:flex-end;
+            align-items:center;
+            gap:10px;
+            padding:4px 0 2px;
+        }
+        .control{
+            border:1px solid var(--border);
+            background:var(--card);
+            color:var(--text);
+            border-radius:999px;
+            padding:8px 12px;
+        }
+        .language{min-width:130px}
+        .theme-btn{width:42px;height:38px;padding:0}
+        .mobile-menu{display:none}
+
+        section{scroll-margin-top:120px}
+        .hero{
+            min-height:700px;
+            display:flex;
+            align-items:center;
+            position:relative;
+            overflow:hidden;
+            color:white;
+            background:
+                linear-gradient(90deg,rgba(4,34,24,.90) 0%,rgba(4,34,24,.67) 46%,rgba(4,34,24,.24) 100%),
+                url("{{ url_for('static', filename='farmer-rice.png') }}") center/cover no-repeat;
+        }
+        .hero::after{
+            content:"";
+            position:absolute;inset:auto 0 0;
+            height:120px;
+            background:linear-gradient(transparent,var(--bg));
+        }
+        .hero-inner{
+            width:min(1250px,100%);
+            margin:auto;
+            padding:90px 24px 130px;
+            position:relative;
+            z-index:2;
+        }
+        .badge{
+            display:inline-block;
+            padding:8px 14px;
+            border-radius:999px;
+            background:rgba(255,255,255,.13);
+            border:1px solid rgba(255,255,255,.25);
+            font-size:12px;
+            font-weight:800;
+            letter-spacing:.7px;
+        }
+        .hero h1{
+            max-width:720px;
+            font-size:clamp(42px,6vw,78px);
+            line-height:1.02;
+            margin:22px 0;
+        }
+        .hero h1 span{color:#7de1b7}
+        .hero p{max-width:680px;color:#e4f1eb;font-size:18px}
+        .hero-buttons{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+        .btn{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            border:0;
+            border-radius:12px;
+            padding:13px 20px;
+            font-weight:800;
+            transition:.2s;
+        }
+        .btn-primary{background:var(--accent);color:#3b270f}
+        .btn-secondary{background:rgba(255,255,255,.12);color:white;border:1px solid rgba(255,255,255,.35)}
+        .btn:hover{transform:translateY(-2px)}
+
+        .weather-card{
+            position:absolute;
+            right:6%;
+            bottom:20%;
+            z-index:3;
+            width:285px;
+            padding:22px;
+            border-radius:24px;
+            background:rgba(255,255,255,.14);
+            border:1px solid rgba(255,255,255,.30);
+            backdrop-filter:blur(14px);
+        }
+        .weather-card small{opacity:.8}
+        .weather-temp{font-size:42px;font-weight:900;margin:8px 0}
+
+        .section{
+            max-width:1250px;
+            margin:auto;
+            padding:90px 24px;
+        }
+        .section-heading{max-width:780px;margin-bottom:35px}
+        .eyebrow{
+            color:var(--green);
+            font-size:12px;
+            font-weight:900;
+            letter-spacing:1.5px;
+        }
+        .section-heading h2{font-size:clamp(30px,4vw,50px);line-height:1.1;margin:10px 0 15px}
+        .section-heading p{color:var(--muted);font-size:17px}
+
+        .planner{
+            display:grid;
+            grid-template-columns:1.1fr .9fr;
+            gap:24px;
+        }
+        .card{
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:24px;
+            padding:28px;
+            box-shadow:var(--shadow);
+        }
+        .form-grid{
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:18px;
+        }
+        .form-group{display:flex;flex-direction:column;gap:7px}
+        label{font-weight:800;font-size:14px}
+        input,select{
+            width:100%;
+            border:1px solid var(--border);
+            background:var(--bg);
+            color:var(--text);
+            border-radius:12px;
+            padding:13px 14px;
+            outline:none;
+        }
+        input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(8,127,91,.10)}
+        .full{grid-column:1/-1}
+        .result-panel{
+            background:linear-gradient(145deg,var(--green),var(--green-dark));
+            color:white;
+            border-radius:24px;
+            padding:30px;
+            min-height:100%;
+        }
+        .result-panel h3{font-size:28px;margin:10px 0}
+        .recommendation-list{display:grid;gap:12px;margin-top:20px}
+        .recommendation-item{
+            background:rgba(255,255,255,.10);
+            border:1px solid rgba(255,255,255,.18);
+            border-radius:14px;
+            padding:13px;
+        }
+        .check-row{display:flex;gap:10px;align-items:flex-start}
+        .check-row input{width:auto;margin-top:5px}
+
+        .capability-grid{
+            display:grid;
+            grid-template-columns:repeat(3,1fr);
+            gap:20px;
+        }
+        .capability-card{
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:22px;
+            padding:25px;
+            transition:.2s;
+        }
+        .capability-card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+        .icon{
+            width:48px;height:48px;border-radius:15px;
+            display:grid;place-items:center;
+            background:var(--green-soft);
+            color:var(--green);
+            font-size:23px;
+            margin-bottom:18px;
+        }
+        .capability-card h3{margin-bottom:7px}
+        .capability-card p{color:var(--muted)}
+
+        .about-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+        .about-card{padding:28px;border-radius:22px;background:var(--card);border:1px solid var(--border)}
+        .about-card p{color:var(--muted);margin-top:8px}
+
+        .hidden{display:none!important}
+        .success{color:#7de1b7;font-weight:900}
+        .error{color:#ffb4a8;font-weight:800}
+        .loading{opacity:.7}
+
+        footer{
+            background:#082b20;
+            color:#dceee7;
+            padding:45px 24px;
+        }
+        .footer-inner{
+            max-width:1250px;margin:auto;
+            display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+        }
+
+        @media(max-width:950px){
+            nav{display:none}
+            .mobile-menu{display:block;border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:10px;padding:8px 11px}
+            .nav-main{flex-wrap:wrap}
+            nav.open{display:flex;width:100%;flex-direction:column;align-items:flex-start;gap:14px;padding:12px 0}
+            .weather-card{position:relative;right:auto;bottom:auto;margin:35px 24px 0}
+            .hero-inner{padding-bottom:60px}
+            .hero{min-height:780px;display:block;padding-top:70px}
+            .planner{grid-template-columns:1fr}
+            .capability-grid,.about-grid{grid-template-columns:repeat(2,1fr)}
+        }
+        @media(max-width:650px){
+            .nav-container{padding-left:15px;padding-right:15px}
+            .nav-controls{justify-content:space-between}
+            .language{flex:1}
+            .hero h1{font-size:45px}
+            .hero p{font-size:16px}
+            .section{padding:65px 15px}
+            .form-grid{grid-template-columns:1fr}
+            .full{grid-column:auto}
+            .capability-grid,.about-grid{grid-template-columns:1fr}
+            .card{padding:20px}
+        }
+
+        /* =========================================================
+           RYTHUCROP — FINAL LAPTOP ONE-SCREEN FIX
+        /* =========================================================
+           RYTHUCROP - CLEAN FINAL DESKTOP LAYOUT
+           ========================================================= */
+
+        @media (min-width:951px){
+
+            html{
+                scroll-behavior:smooth;
+                scroll-padding-top:120px;
+            }
+
+            body{
+                overflow-x:hidden;
+                overflow-y:auto;
+            }
+
+            /* One complete viewport for each selected section */
+            #home,
+            #planning,
+            #recommendation,
+            #yield,
+            #advisory,
+            #about{
+                width:100%;
+                max-width:none;
+                height:calc(100dvh - 120px);
+                min-height:calc(100dvh - 120px);
+                max-height:calc(100dvh - 120px);
+                margin:0;
+                box-sizing:border-box;
+                overflow:hidden;
+                scroll-margin-top:120px;
+            }
+
+            #home{
+                padding:0;
+            }
+
+            #home .hero-inner{
+                width:min(1250px,100%);
+                padding:35px 24px;
+            }
+
+            /* Main sections */
+            #planning.section,
+            #recommendation.section,
+            #yield.section,
+            #advisory.section{
+                padding:38px 24px !important;
+                display:flex;
+                flex-direction:column;
+                justify-content:center;
+            }
+
+            /* Headings */
+            #planning .section-heading,
+            #recommendation .section-heading,
+            #yield .section-heading,
+            #advisory .section-heading{
+                width:min(1250px,100%);
+                max-width:1250px;
+                margin:0 auto 22px !important;
+                flex:0 0 auto;
+            }
+
+            #planning .section-heading h2,
+            #recommendation .section-heading h2,
+            #yield .section-heading h2,
+            #advisory .section-heading h2{
+                font-size:34px !important;
+                line-height:1.1;
+                margin:5px 0 7px;
+            }
+
+            #planning .section-heading p,
+            #recommendation .section-heading p,
+            #yield .section-heading p,
+            #advisory .section-heading p{
+                font-size:14px;
+                line-height:1.4;
+            }
+
+            /* Planning + Advisory */
+            #planning .planner,
+            #advisory .planner{
+                width:min(1250px,100%);
+                margin:0 auto;
+                grid-template-columns:1.1fr .9fr;
+                gap:16px;
+                min-height:0;
+                max-height:none;
+                flex:0 0 auto;
+            }
+
+            /* Cards */
+            #planning .card,
+            #recommendation .card,
+            #yield .card,
+            #advisory .card{
+                padding:18px !important;
+                min-height:0;
+                max-height:none;
+                overflow:hidden;
+                border-radius:20px;
+            }
+
+            /* Forms */
+            #planning .form-grid,
+            #recommendation .form-grid,
+            #yield .form-grid,
+            #advisory .form-grid{
+                gap:8px 14px;
+            }
+
+            #planning .form-group,
+            #recommendation .form-group,
+            #yield .form-group,
+            #advisory .form-group{
+                gap:4px;
+            }
+
+            #planning label,
+            #recommendation label,
+            #yield label,
+            #advisory label{
+                font-size:13px;
+                line-height:1.2;
+            }
+
+            #planning input,
+            #planning select,
+            #recommendation input,
+            #recommendation select,
+            #yield input,
+            #yield select,
+            #advisory input,
+            #advisory select{
+                height:38px;
+                min-height:38px;
+                padding:7px 11px;
+                font-size:13px;
+            }
+
+            /* Buttons */
+            #planning .btn,
+            #recommendation .btn,
+            #yield .btn,
+            #advisory .btn{
+                padding:10px 16px;
+                font-size:13px;
+            }
+
+            /* Result panels */
+            #planning .result-panel,
+            #advisory .result-panel{
+                min-height:0;
+                height:auto;
+                max-height:none;
+                padding:18px;
+                overflow:hidden;
+            }
+
+            #recommendation .result-panel,
+            #yield .result-panel{
+                max-height:none !important;
+                min-height:0 !important;
+                margin-top:12px !important;
+                padding:12px 14px;
+                overflow:hidden;
+            }
+
+            #recommendation .result-panel h3,
+            #yield .result-panel h3{
+                font-size:20px;
+                margin:3px 0;
+            }
+
+            #planning .recommendation-list,
+            #advisory .recommendation-list{
+                max-height:none;
+                overflow:visible;
+                margin-top:10px;
+            }
+
+            #planning .recommendation-item,
+            #advisory .recommendation-item{
+                padding:8px 10px;
+                font-size:12px;
+            }
+
+            /* Recommendation + Yield */
+            #recommendation .card,
+            #yield .card{
+                width:min(1250px,100%);
+                margin:0 auto;
+                flex:0 0 auto;
+            }
+
+            /* About + footer */
+            body.about-active main > section#about{
+                height:calc(100dvh - 120px - 125px);
+                min-height:calc(100dvh - 120px - 125px);
+                max-height:calc(100dvh - 120px - 125px);
+                padding:38px 24px 30px !important;
+                box-sizing:border-box;
+                display:flex;
+                flex-direction:column;
+                justify-content:center;
+                overflow:hidden;
+            }
+
+            #about .section-heading{
+                width:min(1250px,100%);
+                margin:0 auto 20px !important;
+            }
+
+            #about .section-heading h2{
+                font-size:34px !important;
+            }
+
+            #about .about-grid{
+                width:min(1250px,100%);
+                margin:0 auto;
+                grid-template-columns:repeat(3,1fr);
+                gap:14px;
+                flex:0 0 auto;
+            }
+
+            #about .about-card{
+                padding:18px;
+            }
+
+            #about .about-card p{
+                font-size:13px;
+                line-height:1.35;
+            }
+
+            body:not(.about-active) > footer{
+                display:none !important;
+            }
+
+            body.about-active > footer{
+                display:block !important;
+                margin-top:auto !important;
+                flex-shrink:0 !important;
+            }
+        }
+
+                flex: 0 0 auto;
+            }
+
+            /* Cards */
+            #planning .card,
+            #recommendation .card,
+            #yield .card,
+            #advisory .card {
+                padding: 18px;
+                min-height: 0;
+                overflow: hidden;
+                border-radius: 20px;
+            }
+
+            /* Form spacing */
+            #planning .form-grid,
+            #recommendation .form-grid,
+            #yield .form-grid,
+            #advisory .form-grid {
+                gap: 8px 14px;
+            }
+
+            #planning .form-group,
+            #recommendation .form-group,
+            #yield .form-group,
+            #advisory .form-group {
+                gap: 4px;
+            }
+
+            #planning label,
+            #recommendation label,
+            #yield label,
+            #advisory label {
+                font-size: 13px;
+            }
+
+            #planning input,
+            #planning select,
+            #recommendation input,
+            #recommendation select,
+            #yield input,
+            #yield select,
+            #advisory input,
+            #advisory select {
+                height: 38px;
+                min-height: 38px;
+                padding: 7px 11px;
+                font-size: 13px;
+            }
+
+            /* Result panels */
+            #planning .result-panel,
+            #advisory .result-panel {
+                min-height: 0;
+                height: 100%;
+                max-height: 100%;
+                padding: 18px;
+                overflow: hidden;
+            }
+
+            #recommendation .result-panel,
+            #yield .result-panel {
+                max-height: 110px;
+                overflow: hidden;
+            }
+
+            #planning .recommendation-list,
+            #advisory .recommendation-list {
+                max-height: 150px;
+                overflow: hidden;
+            }
+
+            /* About */
+            #about .about-grid {
+                width: min(1250px, 100%);
+                margin: 0 auto;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 14px;
+            }
+
+            #about .about-card {
+                padding: 18px;
+            }
+        }
+
+
+        /* =========================================================
+           RYTHUCROP FINAL DESKTOP FIX
+           This is intentionally last so it overrides all earlier
+           desktop section rules in this same inline stylesheet.
+           ========================================================= */
+        @media (min-width:951px){
+
+            /* Real navbar height is measured by JS below. */
+            :root{
+                --actual-navbar-height:120px;
+            }
+
+            html{
+                scroll-behavior:smooth;
+                scroll-padding-top:var(--actual-navbar-height);
+            }
+
+            #home,
+            #planning,
+            #recommendation,
+            #yield,
+            #advisory,
+            #about{
+                width:100%;
+                max-width:none;
+                height:auto;
+                min-height:0;
+                max-height:none;
+                margin:0;
+                box-sizing:border-box;
+                overflow:hidden;
+                scroll-margin-top:var(--actual-navbar-height);
+            }
+
+            /* Tool sections */
+            #planning,
+            #recommendation,
+            #yield,
+            #advisory,
+            #about{
+                padding:16px 24px;
+                display:flex;
+                flex-direction:column;
+                justify-content:center;
+            }
+
+            #planning .section-heading,
+            #recommendation .section-heading,
+            #yield .section-heading,
+            #advisory .section-heading,
+            #about .section-heading{
+                margin:0 auto 8px;
+                width:min(1250px,100%);
+                max-width:1250px;
+                flex:0 0 auto;
+            }
+
+            #planning .section-heading h2,
+            #recommendation .section-heading h2,
+            #yield .section-heading h2,
+            #advisory .section-heading h2,
+            #about .section-heading h2{
+                font-size:28px;
+                line-height:1.08;
+                margin:3px 0 4px;
+            }
+
+            #planning .section-heading p,
+            #recommendation .section-heading p,
+            #yield .section-heading p,
+            #advisory .section-heading p,
+            #about .section-heading p{
+                font-size:12px;
+                line-height:1.25;
+            }
+
+            #planning .planner,
+            #advisory .planner{
+                width:min(1250px,100%);
+                margin:0 auto;
+                grid-template-columns:1.1fr .9fr;
+                gap:12px;
+                min-height:0;
+                max-height:calc(100% - 70px);
+                flex:1 1 auto;
+            }
+
+            #planning .card,
+            #recommendation .card,
+            #yield .card,
+            #advisory .card{
+                min-height:0;
+                max-height:100%;
+                padding:14px 18px;
+                overflow:hidden;
+                border-radius:20px;
+            }
+
+            #planning .form-grid,
+            #recommendation .form-grid,
+            #yield .form-grid,
+            #advisory .form-grid{
+                gap:6px 12px;
+            }
+
+            #planning .form-group,
+            #recommendation .form-group,
+            #yield .form-group,
+            #advisory .form-group{
+                gap:2px;
+            }
+
+            #planning label,
+            #recommendation label,
+            #yield label,
+            #advisory label{
+                font-size:12px;
+                line-height:1.2;
+            }
+
+            #planning input,
+            #planning select,
+            #recommendation input,
+            #recommendation select,
+            #yield input,
+            #yield select,
+            #advisory input,
+            #advisory select{
+                height:34px;
+                min-height:34px;
+                padding:5px 10px;
+                font-size:12px;
+            }
+
+            #planning .btn,
+            #recommendation .btn,
+            #yield .btn,
+            #advisory .btn{
+                padding:8px 14px;
+                font-size:12px;
+            }
+
+            #planning .result-panel,
+            #advisory .result-panel{
+                min-height:0;
+                height:100%;
+                max-height:100%;
+                padding:14px;
+                overflow:hidden;
+            }
+
+            #planning .recommendation-list,
+            #advisory .recommendation-list{
+                gap:6px;
+                margin-top:8px;
+                max-height:120px;
+                overflow:hidden;
+            }
+
+            #planning .recommendation-item,
+            #advisory .recommendation-item{
+                padding:7px 9px;
+                font-size:11px;
+            }
+
+            /* Recommendation + yield */
+            #recommendation .card,
+            #yield .card{
+                width:min(1250px,100%);
+                margin:0 auto;
+                flex:0 0 auto;
+            }
+
+            #recommendation .result-panel,
+            #yield .result-panel{
+                max-height:80px !important;
+                min-height:0 !important;
+                margin-top:8px !important;
+                padding:9px 12px;
+                overflow:hidden;
+            }
+
+            #recommendation .result-panel h3,
+            #yield .result-panel h3{
+                font-size:19px;
+                margin:2px 0;
+            }
+
+            /* About */
+            #about .about-grid{
+                width:min(1250px,100%);
+                margin:0 auto;
+                grid-template-columns:repeat(3,1fr);
+                gap:12px;
+                flex:0 0 auto;
+            }
+
+            #about .about-card{
+                padding:14px;
+            }
+
+            #about .about-card p{
+                font-size:12px;
+                line-height:1.3;
+            }
+        }
+/* RythuCrop - Show only selected section */
+main > section { display: none !important; }
+
+main > section.active-section { display: block !important; }
+            /* RythuCrop - Balanced Final Section Layout */
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main > section {
+    box-sizing: border-box;
+    min-height: calc(100vh - var(--actual-navbar-height, 100px));
+    overflow: hidden;
+}
+
+/* Footer only on About */
+body:not(.about-active) > footer {
+    display: none !important;
+}
+
+body.about-active > footer {
+    display: block !important;
+    margin-top: auto !important;
+    flex-shrink: 0 !important;
+}
+
+
+/* =========================
+   FARM PLANNING
+   ========================= */
+
+#planning.section {
+    min-height: calc(100vh - var(--actual-navbar-height, 100px));
+    padding-top: 42px !important;
+    padding-bottom: 34px !important;
+}
+
+#planning .section-heading {
+    margin-bottom: 25px !important;
+}
+
+#planning .section-heading h2 {
+    font-size: 35px !important;
+    margin-bottom: 7px !important;
+}
+
+#planning .section-heading p {
+    font-size: 15px !important;
+}
+
+
+/* =========================
+   CROP RECOMMENDATION
+   ========================= */
+
+#recommendation.section {
+    min-height: calc(100vh - var(--actual-navbar-height, 100px));
+    padding-top: 42px !important;
+    padding-bottom: 34px !important;
+}
+
+#recommendation .section-heading {
+    margin-bottom: 25px !important;
+}
+
+#recommendation .section-heading h2 {
+    font-size: 35px !important;
+    margin-bottom: 7px !important;
+}
+
+#recommendation .section-heading p {
+    font-size: 15px !important;
+}
+
+
+/* =========================
+   YIELD PREDICTION
+   ========================= */
+
+#yield.section {
+    min-height: calc(100vh - var(--actual-navbar-height, 100px));
+    padding-top: 42px !important;
+    padding-bottom: 34px !important;
+}
+
+#yield .section-heading {
+    margin-bottom: 25px !important;
+}
+
+#yield .section-heading h2 {
+    font-size: 35px !important;
+    margin-bottom: 7px !important;
+}
+
+#yield .section-heading p {
+    font-size: 15px !important;
+}
+
+
+/* =========================
+   SMART ADVISORY
+   ========================= */
+
+#advisory.section {
+    min-height: calc(100vh - var(--actual-navbar-height, 100px));
+    padding-top: 52px !important;
+    padding-bottom: 42px !important;
+}
+
+#advisory .section-heading {
+    margin-bottom: 30px !important;
+}
+
+#advisory .section-heading h2 {
+    font-size: 38px !important;
+    margin-bottom: 8px !important;
+}
+
+#advisory .section-heading p {
+    font-size: 15px !important;
+}
+
+
+/* =========================
+   ABOUT
+   ========================= */
+
+body.about-active main > section#about {
+    min-height: calc(100vh - var(--actual-navbar-height, 100px) - 125px);
+    box-sizing: border-box;
+    padding-top: 38px !important;
+    padding-bottom: 25px !important;
+}
+
+#about .section-heading {
+    margin-bottom: 24px !important;
+}
+
+#about .section-heading h2 {
+    font-size: 35px !important;
+    margin-bottom: 7px !important;
+}
+
+#about .section-heading p {
+    font-size: 15px !important;
+}
+
+body.about-active > footer {
+    margin-top: auto !important;
+    flex-shrink: 0 !important;
+}
+
+
+/* =========================
+   LAPTOP SCREEN BALANCE
+   ========================= */
+
+@media (min-width: 1000px) {
+
+    #planning .section-heading h2,
+    #recommendation .section-heading h2,
+    #yield .section-heading h2 {
+        font-size: 35px !important;
+    }
+
+    #advisory .section-heading h2 {
+        font-size: 38px !important;
+    }
+}
+
+
+/* =========================
+   MOBILE
+   ========================= */
+
+@media (max-width: 768px) {
+
+    main > section {
+        min-height: auto;
+        overflow: visible;
+    }
+
+    #planning.section,
+    #recommendation.section,
+    #yield.section,
+    #advisory.section {
+        padding-top: 30px !important;
+        padding-bottom: 30px !important;
+    }
+
+    #planning .section-heading h2,
+    #recommendation .section-heading h2,
+    #yield .section-heading h2,
+    #advisory .section-heading h2 {
+        font-size: 30px !important;
+    }
+
+    body.about-active main > section#about {
+        min-height: auto;
+        padding-top: 30px !important;
+        padding-bottom: 25px !important;
+    }
+}
+</style>
+</head>
+
+<body>
+<header class="navbar">
+    <div class="nav-container">
+        <div class="nav-main">
+            <a class="brand" href="#home">
+                <span class="brand-icon">🌾</span>
+                <span>RythuCrop</span>
+            </a>
+
+            <button class="mobile-menu" id="menuBtn">☰</button>
+
+            <nav id="mainNav">
+                <a href="#home" data-i18n="nav_home">Home</a>
+                <a href="#planning" data-i18n="nav_planning">Farm Planning</a>
+                <a href="#recommendation" data-i18n="nav_crop">Crop Recommendation</a>
+                <a href="#yield" data-i18n="nav_yield">Yield Prediction</a>
+                <a href="#advisory" data-i18n="nav_advisory">Smart Advisory</a>
+                <a href="#about" data-i18n="nav_about">About</a>
+            </nav>
+        </div>
+
+        <div class="nav-controls">
+            <select id="language" class="control language" aria-label="Language">
+                <option value="en">🌐 English</option>
+                <option value="te">తెలుగు</option>
+                <option value="hi">हिन्दी</option>
+                <option value="ta">தமிழ்</option>
+                <option value="kn">ಕನ್ನಡ</option>
+                <option value="ml">മലയാളം</option>
+                <option value="mr">मराठी</option>
+                <option value="bn">বাংলা</option>
+                <option value="od">ଓଡ଼ିଆ</option>
+            </select>
+            <button id="themeBtn" class="control theme-btn" title="Toggle day/night">☀️</button>
+        </div>
+    </div>
+</header>
+
+<main>
+<section id="home" class="hero">
+    <div class="hero-inner">
+        <span class="badge" data-i18n="hero_badge">SMART AGRICULTURE • MACHINE LEARNING</span>
+        <h1>
+            <span data-i18n="hero_title1">Smart Farming.</span><br>
+            <span data-i18n="hero_title2">Better Decisions.</span>
+        </h1>
+        <p data-i18n="hero_desc">
+            RythuCrop helps farmers choose suitable crops, estimate yield and plan farming decisions using agricultural data and machine learning.
+        </p>
+        <div class="hero-buttons">
+            <a href="#planning" class="btn btn-primary" data-i18n="hero_btn1">Start Farm Planning →</a>
+            <a href="#recommendation" class="btn btn-secondary" data-i18n="hero_btn2">Get Crop Recommendation</a>
+        </div>
+    </div>
+
+    <div class="weather-card">
+        <small data-i18n="hero_card_title">FARM DECISION SUPPORT</small>
+        <div class="weather-temp">🌱</div>
+        <strong data-i18n="hero_card_main">From soil to harvest</strong>
+        <p data-i18n="hero_card_desc">Enter your farm requirements and receive practical suggestions.</p>
+    </div>
+</section>
+
+<section id="planning" class="section">
+    <div class="section-heading">
+        <span class="eyebrow" data-i18n="plan_eyebrow">FARM PLANNING</span>
+        <h2 data-i18n="plan_title">Tell us about your farm</h2>
+        <p data-i18n="plan_desc">Choose simple options. RythuCrop will convert your requirements into a practical starting plan.</p>
+    </div>
+
+    <div class="planner">
+        <div class="card">
+            <form id="planningForm" class="form-grid">
+                <div class="form-group">
+                    <label data-i18n="land">Land area (acres)</label>
+                    <input id="land" type="number" min="0.1" step="0.1" data-i18n-placeholder="ph_land" placeholder="e.g. 2" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="season">Season</label>
+                    <select id="season">
+                        <option value="Kharif" data-i18n-option="season_kharif">Kharif</option>
+                        <option value="Rabi" data-i18n-option="season_rabi">Rabi</option>
+                        <option value="Summer" data-i18n-option="season_summer">Summer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="soil">Soil type</label>
+                    <select id="soil">
+                        <option value="Loamy" data-i18n-option="soil_loamy">Loamy</option>
+                        <option value="Black Soil" data-i18n-option="soil_black">Black Soil</option>
+                        <option value="Red Soil" data-i18n-option="soil_red">Red Soil</option>
+                        <option value="Clay Soil" data-i18n-option="soil_clay">Clay Soil</option>
+                        <option value="Sandy Soil" data-i18n-option="soil_sandy">Sandy Soil</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="irrigation">Irrigation</label>
+                    <select id="irrigation">
+                        <option value="Good water availability" data-i18n-option="water_good">Good water availability</option>
+                        <option value="Moderate water availability" data-i18n-option="water_moderate">Moderate water availability</option>
+                        <option value="Low water availability" data-i18n-option="water_low">Low water availability</option>
+                        <option value="Rainfed" data-i18n-option="water_rainfed">Rainfed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="goal">Main goal</label>
+                    <select id="goal">
+                        <option value="Higher yield" data-i18n-option="goal_yield">Higher yield</option>
+                        <option value="Lower water use" data-i18n-option="goal_water">Lower water use</option>
+                        <option value="Lower input cost" data-i18n-option="goal_cost">Lower input cost</option>
+                        <option value="Balanced farming" data-i18n-option="goal_balanced">Balanced farming</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="experience">Farming experience</label>
+                    <select id="experience">
+                        <option value="Beginner" data-i18n-option="exp_beginner">Beginner</option>
+                        <option value="Some experience" data-i18n-option="exp_some">Some experience</option>
+                        <option value="Experienced" data-i18n-option="exp_experienced">Experienced</option>
+                    </select>
+                </div>
+                <div class="full">
+                    <button class="btn btn-primary" type="submit" data-i18n="generate_plan">Generate My Plan →</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="result-panel">
+            <small data-i18n="plan_result_label">YOUR STARTING PLAN</small>
+            <h3 id="planTitle" data-i18n="plan_result_title">Your recommendations will appear here</h3>
+            <p id="planSummary" data-i18n="plan_result_desc">Select your farm requirements and click Generate My Plan.</p>
+            <div id="planResults" class="recommendation-list"></div>
+        </div>
+    </div>
+</section>
+
+<section id="recommendation" class="section">
+    <div class="section-heading">
+        <span class="eyebrow" data-i18n="crop_eyebrow">CROP RECOMMENDATION</span>
+        <h2 data-i18n="crop_title">Find the right crop</h2>
+        <p data-i18n="crop_desc">Enter the soil and climate values used by the existing trained recommendation model.</p>
+    </div>
+
+    <div class="card">
+        <form id="cropForm" class="form-grid">
+            <div class="form-group"><label data-i18n="nitrogen">Nitrogen (N)</label><input id="N" type="number" step="any" data-i18n-placeholder="ph_crop" placeholder="e.g. 90" required></div>
+            <div class="form-group"><label data-i18n="phosphorus">Phosphorus (P)</label><input id="P" type="number" step="any" data-i18n-placeholder="ph_crop_p" placeholder="e.g. 42" required></div>
+            <div class="form-group"><label data-i18n="potassium">Potassium (K)</label><input id="K" type="number" step="any" data-i18n-placeholder="ph_crop_k" placeholder="e.g. 43" required></div>
+            <div class="form-group"><label data-i18n="temperature">Temperature (°C)</label><input id="temperature" type="number" step="any" data-i18n-placeholder="ph_temp" placeholder="e.g. 25" required></div>
+            <div class="form-group"><label data-i18n="humidity">Humidity (%)</label><input id="humidity" type="number" step="any" data-i18n-placeholder="ph_humidity" placeholder="e.g. 80" required></div>
+            <div class="form-group"><label data-i18n="soil_ph">Soil pH</label><input id="ph" type="number" step="any" data-i18n-placeholder="ph_ph" placeholder="e.g. 6.5" required></div>
+            <div class="form-group"><label data-i18n="rainfall">Rainfall (mm)</label><input id="rainfall" type="number" step="any" data-i18n-placeholder="ph_rainfall" placeholder="e.g. 200" required></div>
+            <div class="full">
+                <button type="submit" class="btn btn-primary" data-i18n="recommend_btn">Recommend Crop →</button>
+            </div>
+        </form>
+
+        <div id="cropResult" class="result-panel hidden" style="margin-top:24px;min-height:auto">
+            <small data-i18n="recommended">RECOMMENDED CROP</small>
+            <h3 id="recommendedCrop">--</h3>
+            <p data-i18n="crop_result_desc">Based on the soil and climate values provided.</p>
+        </div>
+    </div>
+</section>
+
+<section id="yield" class="section">
+    <div class="section-heading">
+        <span class="eyebrow" data-i18n="yield_eyebrow">YIELD PREDICTION</span>
+        <h2 data-i18n="yield_title">Estimate your crop yield</h2>
+        <p data-i18n="yield_desc">Provide the agricultural information required by the existing trained yield model.</p>
+    </div>
+
+    <div class="card">
+        <form id="yieldForm" class="form-grid">
+            <div class="form-group"><label data-i18n="yield_crop">Crop</label><input id="Crop" type="text" data-i18n-placeholder="ph_crop_text" placeholder="e.g. Rice" required></div>
+            <div class="form-group"><label data-i18n="crop_year">Crop Year</label><input id="Crop_Year" type="number" data-i18n-placeholder="ph_year" placeholder="e.g. 2024" required></div>
+            <div class="form-group"><label data-i18n="yield_season">Season</label><input id="Season" type="text" data-i18n-placeholder="ph_season_text" placeholder="e.g. Kharif" required></div>
+            <div class="form-group"><label data-i18n="state">State</label><input id="State" type="text" data-i18n-placeholder="ph_state" placeholder="e.g. Andhra Pradesh" required></div>
+            <div class="form-group"><label data-i18n="area">Area (hectares)</label><input id="Area" type="number" step="any" data-i18n-placeholder="ph_area" placeholder="e.g. 100" required></div>
+            <div class="form-group"><label data-i18n="production">Production (tonnes)</label><input id="Production" type="number" step="any" data-i18n-placeholder="ph_production" placeholder="e.g. 500" required></div>
+            <div class="form-group"><label data-i18n="annual_rainfall">Annual Rainfall (mm)</label><input id="Annual_Rainfall" type="number" step="any" data-i18n-placeholder="ph_annual_rainfall" placeholder="e.g. 1200" required></div>
+            <div class="form-group"><label data-i18n="fertilizer">Fertilizer (kg)</label><input id="Fertilizer" type="number" step="any" data-i18n-placeholder="ph_fertilizer" placeholder="e.g. 500" required></div>
+            <div class="form-group"><label data-i18n="pesticide">Pesticide (kg)</label><input id="Pesticide" type="number" data-i18n-placeholder="ph_pesticide" placeholder="e.g. 50" required></div>
+            <div class="full">
+                <button type="submit" class="btn btn-primary" data-i18n="yield_btn">Predict Crop Yield →</button>
+            </div>
+        </form>
+
+        <div id="yieldResult" class="result-panel hidden" style="margin-top:24px;min-height:auto">
+            <small data-i18n="predicted">PREDICTED CROP YIELD</small>
+            <h3 id="predictedYield">--</h3>
+            <p data-i18n="yield_result_desc">Estimated using the trained machine learning model.</p>
+        </div>
+    </div>
+</section>
+
+<section id="advisory" class="section">
+    <div class="section-heading">
+        <span class="eyebrow" data-i18n="advisory_eyebrow">SMART ADVISORY</span>
+        <h2 data-i18n="advisory_title">What should I do next?</h2>
+        <p data-i18n="advisory_desc">Choose your crop and priority. The system gives a simple action checklist.</p>
+    </div>
+
+    <div class="planner">
+        <div class="card">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label data-i18n="advisory_crop">Crop</label>
+                    <select id="adCrop">
+                        <option value="Rice" data-i18n-option="crop_rice">Rice</option><option value="Wheat" data-i18n-option="crop_wheat">Wheat</option><option value="Maize" data-i18n-option="crop_maize">Maize</option>
+                        <option value="Cotton" data-i18n-option="crop_cotton">Cotton</option><option value="Groundnut" data-i18n-option="crop_groundnut">Groundnut</option><option value="Chickpea" data-i18n-option="crop_chickpea">Chickpea</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="advisory_priority">Priority</label>
+                    <select id="adPriority">
+                        <option value="Water saving" data-i18n-option="priority_water">Water saving</option>
+                        <option value="Fertilizer management" data-i18n-option="priority_fertilizer">Fertilizer management</option>
+                        <option value="Pest prevention" data-i18n-option="priority_pest">Pest prevention</option>
+                        <option value="Higher yield" data-i18n-option="goal_yield">Higher yield</option>
+                    </select>
+                </div>
+                <div class="full">
+                    <button class="btn btn-primary" id="adviceBtn" type="button" data-i18n="get_advice">Get My Advice →</button>
+                </div>
+            </div>
+        </div>
+        <div class="result-panel">
+            <small data-i18n="advice_label">NEXT ACTIONS</small>
+            <h3 id="adviceTitle" data-i18n="advice_title">Choose your priority</h3>
+            <div id="adviceList" class="recommendation-list"></div>
+        </div>
+    </div>
+</section>
+
+<section id="about" class="section">
+    <div class="section-heading">
+        <span class="eyebrow" data-i18n="about_eyebrow">ABOUT RYTHUCROP</span>
+        <h2 data-i18n="about_title">Simple technology for better farming decisions</h2>
+        <p data-i18n="about_desc">RythuCrop connects a farmer-friendly interface with the project's existing machine learning models.</p>
+    </div>
+
+    <div class="about-grid">
+        <div class="about-card">
+            <div class="icon">🤖</div>
+            <h3 data-i18n="about_ml">Machine Learning</h3>
+            <p data-i18n="about_ml_desc">Existing trained models are used for crop recommendation and yield prediction.</p>
+        </div>
+        <div class="about-card">
+            <div class="icon">🌱</div>
+            <h3 data-i18n="about_farmer">Farmer First</h3>
+            <p data-i18n="about_farmer_desc">Simple choices and clear outputs are designed for easy use.</p>
+        </div>
+        <div class="about-card">
+            <div class="icon">📱</div>
+            <h3 data-i18n="about_mobile">Mobile Friendly</h3>
+            <p data-i18n="about_mobile_desc">The interface adapts to mobile, tablet and desktop screens.</p>
+        </div>
+    </div>
+</section>
+</main>
+
+<footer>
+    <div class="footer-inner">
+        <div>
+            <strong>🌾 RythuCrop</strong>
+            <p data-i18n="footer_desc">Smart agriculture using machine learning.</p>
+        </div>
+        <div><p>© 2026 RythuCrop</p></div>
+    </div>
+</footer>
+
+<script>
+const translations = {
+  en:{
+    nav_home:"Home",nav_planning:"Farm Planning",nav_crop:"Crop Recommendation",nav_yield:"Yield Prediction",nav_advisory:"Smart Advisory",nav_about:"About",
+    hero_badge:"SMART AGRICULTURE • MACHINE LEARNING",hero_title1:"Smart Farming.",hero_title2:"Better Decisions.",hero_desc:"RythuCrop helps farmers choose suitable crops, estimate yield and plan farming decisions using agricultural data and machine learning.",hero_btn1:"Start Farm Planning →",hero_btn2:"Get Crop Recommendation",hero_card_title:"FARM DECISION SUPPORT",hero_card_main:"From soil to harvest",hero_card_desc:"Enter your farm requirements and receive practical suggestions.",
+    plan_eyebrow:"FARM PLANNING",plan_title:"Tell us about your farm",plan_desc:"Choose simple options. RythuCrop will convert your requirements into a practical starting plan.",land:"Land area (acres)",season:"Season",soil:"Soil type",irrigation:"Irrigation",goal:"Main goal",experience:"Farming experience",generate_plan:"Generate My Plan →",plan_result_label:"YOUR STARTING PLAN",plan_result_title:"Your recommendations will appear here",plan_result_desc:"Select your farm requirements and click Generate My Plan.",
+    crop_eyebrow:"CROP RECOMMENDATION",crop_title:"Find the right crop",crop_desc:"Enter the soil and climate values used by the existing trained recommendation model.",nitrogen:"Nitrogen (N)",phosphorus:"Phosphorus (P)",potassium:"Potassium (K)",temperature:"Temperature (°C)",humidity:"Humidity (%)",soil_ph:"Soil pH",rainfall:"Rainfall (mm)",recommend_btn:"Recommend Crop →",recommended:"RECOMMENDED CROP",crop_result_desc:"Based on the soil and climate values provided.",
+    yield_eyebrow:"YIELD PREDICTION",yield_title:"Estimate your crop yield",yield_desc:"Provide the agricultural information required by the existing trained yield model.",yield_crop:"Crop",crop_year:"Crop Year",yield_season:"Season",state:"State",area:"Area (hectares)",production:"Production (tonnes)",annual_rainfall:"Annual Rainfall (mm)",fertilizer:"Fertilizer (kg)",pesticide:"Pesticide (kg)",yield_btn:"Predict Crop Yield →",predicted:"PREDICTED CROP YIELD",yield_result_desc:"Estimated using the trained machine learning model.",
+    advisory_eyebrow:"SMART ADVISORY",advisory_title:"What should I do next?",advisory_desc:"Choose your crop and priority. The system gives a simple action checklist.",advisory_crop:"Crop",advisory_priority:"Priority",get_advice:"Get My Advice →",advice_label:"NEXT ACTIONS",advice_title:"Choose your priority",
+    about_eyebrow:"ABOUT RYTHUCROP",about_title:"Simple technology for better farming decisions",about_desc:"RythuCrop connects a farmer-friendly interface with the project's existing machine learning models.",about_ml:"Machine Learning",about_ml_desc:"Existing trained models are used for crop recommendation and yield prediction.",about_farmer:"Farmer First",about_farmer_desc:"Simple choices and clear outputs are designed for easy use.",about_mobile:"Mobile Friendly",about_mobile_desc:"The interface adapts to mobile, tablet and desktop screens.",footer_desc:"Smart agriculture using machine learning.",
+    season_kharif:"Kharif",season_rabi:"Rabi",season_summer:"Summer",soil_loamy:"Loamy",soil_black:"Black Soil",soil_red:"Red Soil",soil_clay:"Clay Soil",soil_sandy:"Sandy Soil",water_good:"Good water availability",water_moderate:"Moderate water availability",water_low:"Low water availability",water_rainfed:"Rainfed",goal_yield:"Higher yield",goal_water:"Lower water use",goal_cost:"Lower input cost",goal_balanced:"Balanced farming",exp_beginner:"Beginner",exp_some:"Some experience",exp_experienced:"Experienced",crop_rice:"Rice",crop_wheat:"Wheat",crop_maize:"Maize",crop_cotton:"Cotton",crop_groundnut:"Groundnut",crop_chickpea:"Chickpea",priority_water:"Water saving",priority_fertilizer:"Fertilizer management",priority_pest:"Pest prevention",
+    ph_land:"e.g. 2",ph_crop:"e.g. 90",ph_crop_p:"e.g. 42",ph_crop_k:"e.g. 43",ph_temp:"e.g. 25",ph_humidity:"e.g. 80",ph_ph:"e.g. 6.5",ph_rainfall:"e.g. 200",ph_crop_text:"e.g. Rice",ph_year:"e.g. 2024",ph_season_text:"e.g. Kharif",ph_state:"e.g. Andhra Pradesh",ph_area:"e.g. 100",ph_production:"e.g. 500",ph_annual_rainfall:"e.g. 1200",ph_fertilizer:"e.g. 500",ph_pesticide:"e.g. 50",
+    calculating:"Calculating…",prediction_failed:"Prediction failed",server_error:"Server error",plan_generated:"Plan generated",plan_summary:"These are decision-support suggestions. Confirm local agronomy requirements before applying inputs.",unit_tonnes_ha:"tonnes/ha",
+    advice_title_dynamic:"{crop} • {priority}"
+  }
+};
+
+const langCore={
+  te:{nav_home:"హోమ్",nav_planning:"వ్యవసాయ ప్రణాళిక",nav_crop:"పంట సిఫార్సు",nav_yield:"దిగుబడి అంచనా",nav_advisory:"స్మార్ట్ సలహా",nav_about:"మా గురించి",hero_badge:"స్మార్ట్ వ్యవసాయం • మెషిన్ లెర్నింగ్",hero_title1:"స్మార్ట్ వ్యవసాయం.",hero_title2:"మెరుగైన నిర్ణయాలు.",hero_desc:"వ్యవసాయ డేటా మరియు మెషిన్ లెర్నింగ్ ఆధారంగా సరైన పంటను ఎంచుకోవడానికి, దిగుబడిని అంచనా వేయడానికి RythuCrop సహాయపడుతుంది.",hero_btn1:"వ్యవసాయ ప్రణాళిక ప్రారంభించండి →",hero_btn2:"పంట సిఫార్సు పొందండి",hero_card_title:"వ్యవసాయ నిర్ణయ సహాయం",hero_card_main:"నేల నుండి పంట వరకు",hero_card_desc:"మీ వ్యవసాయ అవసరాలను నమోదు చేసి సులభమైన సూచనలు పొందండి.",plan_eyebrow:"వ్యవసాయ ప్రణాళిక",plan_title:"మీ పొలం గురించి చెప్పండి",plan_desc:"సులభమైన ఎంపికలు చేయండి. మీ అవసరాలకు సరిపోయే ప్రారంభ ప్రణాళికను RythuCrop సూచిస్తుంది.",land:"భూమి విస్తీర్ణం (ఎకరాలు)",season:"సీజన్",soil:"నేల రకం",irrigation:"నీటి సౌకర్యం",goal:"ప్రధాన లక్ష్యం",experience:"వ్యవసాయ అనుభవం",generate_plan:"నా ప్రణాళిక తయారు చేయండి →",plan_result_label:"మీ ప్రారంభ ప్రణాళిక",plan_result_title:"మీ సూచనలు ఇక్కడ కనిపిస్తాయి",plan_result_desc:"మీ అవసరాలను ఎంచుకుని నా ప్రణాళికను నొక్కండి.",crop_eyebrow:"పంట సిఫార్సు",crop_title:"సరైన పంటను కనుగొనండి",crop_desc:"పంట సిఫార్సు మోడల్‌కు అవసరమైన నేల మరియు వాతావరణ విలువలను నమోదు చేయండి.",nitrogen:"నైట్రోజన్ (N)",phosphorus:"ఫాస్ఫరస్ (P)",potassium:"పొటాషియం (K)",temperature:"ఉష్ణోగ్రత (°C)",humidity:"తేమ (%)",soil_ph:"నేల pH",rainfall:"వర్షపాతం (mm)",recommend_btn:"పంట సిఫార్సు చేయండి →",recommended:"సిఫార్సు చేసిన పంట",crop_result_desc:"మీరు ఇచ్చిన నేల మరియు వాతావరణ విలువల ఆధారంగా.",yield_eyebrow:"దిగుబడి అంచనా",yield_title:"మీ పంట దిగుబడిని అంచనా వేయండి",yield_desc:"దిగుబడి మోడల్‌కు అవసరమైన వ్యవసాయ సమాచారాన్ని ఇవ్వండి.",yield_crop:"పంట",crop_year:"పంట సంవత్సరం",yield_season:"సీజన్",state:"రాష్ట్రం",area:"విస్తీర్ణం (హెక్టార్లు)",production:"ఉత్పత్తి (టన్నులు)",annual_rainfall:"వార్షిక వర్షపాతం (mm)",fertilizer:"ఎరువు (kg)",pesticide:"పురుగుమందు (kg)",yield_btn:"పంట దిగుబడిని అంచనా వేయండి →",predicted:"అంచనా పంట దిగుబడి",yield_result_desc:"శిక్షణ పొందిన మెషిన్ లెర్నింగ్ మోడల్ ఆధారంగా.",advisory_eyebrow:"స్మార్ట్ సలహా",advisory_title:"తర్వాత నేను ఏమి చేయాలి?",advisory_desc:"పంట మరియు మీ ప్రధాన అవసరాన్ని ఎంచుకోండి. సులభమైన చర్యల జాబితా వస్తుంది.",advisory_crop:"పంట",advisory_priority:"ప్రాధాన్యత",get_advice:"నా సలహా పొందండి →",advice_label:"తదుపరి చర్యలు",advice_title:"మీ ప్రాధాన్యతను ఎంచుకోండి",about_eyebrow:"RYTHUCROP గురించి",about_title:"మెరుగైన వ్యవసాయ నిర్ణయాల కోసం సులభమైన సాంకేతికత",about_desc:"RythuCrop రైతులకు సులభమైన ఇంటర్‌ఫేస్‌ను ప్రాజెక్ట్‌లోని ML మోడళ్లతో కలుపుతుంది.",about_ml:"మెషిన్ లెర్నింగ్",about_ml_desc:"పంట సిఫార్సు మరియు దిగుబడి అంచనాకు శిక్షణ పొందిన మోడళ్లను ఉపయోగిస్తాము.",about_farmer:"రైతే మొదటి ప్రాధాన్యత",about_farmer_desc:"సులభమైన ఎంపికలు మరియు స్పష్టమైన ఫలితాల కోసం రూపొందించబడింది.",about_mobile:"మొబైల్‌కు అనుకూలం",about_mobile_desc:"మొబైల్, టాబ్లెట్ మరియు డెస్క్‌టాప్‌లకు అనుకూలంగా ఉంటుంది.",footer_desc:"మెషిన్ లెర్నింగ్ ఆధారిత స్మార్ట్ వ్యవసాయం."},
+  hi:{nav_home:"होम",nav_planning:"कृषि योजना",nav_crop:"फसल सुझाव",nav_yield:"उपज अनुमान",nav_advisory:"स्मार्ट सलाह",nav_about:"हमारे बारे में",hero_badge:"स्मार्ट कृषि • मशीन लर्निंग",hero_title1:"स्मार्ट खेती.",hero_title2:"बेहतर फैसले.",hero_desc:"RythuCrop कृषि डेटा और मशीन लर्निंग की मदद से सही फसल चुनने और उपज का अनुमान लगाने में मदद करता है.",hero_btn1:"कृषि योजना शुरू करें →",hero_btn2:"फसल सुझाव लें",hero_card_title:"कृषि निर्णय सहायता",hero_card_main:"मिट्टी से फसल तक",hero_card_desc:"अपनी खेती की जरूरतें दर्ज करें और उपयोगी सुझाव पाएं.",plan_eyebrow:"कृषि योजना",plan_title:"अपने खेत के बारे में बताएं",plan_desc:"सरल विकल्प चुनें और अपनी जरूरतों के अनुसार शुरुआती योजना पाएं.",land:"भूमि क्षेत्र (एकड़)",season:"मौसम",soil:"मिट्टी का प्रकार",irrigation:"सिंचाई",goal:"मुख्य लक्ष्य",experience:"कृषि अनुभव",generate_plan:"मेरी योजना बनाएं →",plan_result_label:"आपकी शुरुआती योजना",plan_result_title:"आपके सुझाव यहां दिखाई देंगे",plan_result_desc:"अपनी जरूरतें चुनकर योजना बनाएं.",crop_eyebrow:"फसल सुझाव",crop_title:"सही फसल खोजें",crop_desc:"मौजूदा प्रशिक्षित मॉडल के लिए मिट्टी और मौसम के मान दर्ज करें.",nitrogen:"नाइट्रोजन (N)",phosphorus:"फॉस्फोरस (P)",potassium:"पोटैशियम (K)",temperature:"तापमान (°C)",humidity:"नमी (%)",soil_ph:"मिट्टी pH",rainfall:"वर्षा (mm)",recommend_btn:"फसल सुझाएं →",recommended:"सुझाई गई फसल",crop_result_desc:"दिए गए मिट्टी और मौसम के मान के आधार पर.",yield_eyebrow:"उपज अनुमान",yield_title:"अपनी फसल की उपज का अनुमान लगाएं",yield_desc:"मौजूदा yield मॉडल के लिए कृषि जानकारी दें.",yield_crop:"फसल",crop_year:"फसल वर्ष",yield_season:"मौसम",state:"राज्य",area:"क्षेत्र (हेक्टेयर)",production:"उत्पादन (टन)",annual_rainfall:"वार्षिक वर्षा (mm)",fertilizer:"उर्वरक (kg)",pesticide:"कीटनाशक (kg)",yield_btn:"उपज का अनुमान →",predicted:"अनुमानित उपज",yield_result_desc:"प्रशिक्षित मशीन लर्निंग मॉडल के आधार पर.",advisory_eyebrow:"स्मार्ट सलाह",advisory_title:"अब मुझे क्या करना चाहिए?",advisory_desc:"फसल और प्राथमिकता चुनें और सरल कार्रवाई सूची पाएं.",advisory_crop:"फसल",advisory_priority:"प्राथमिकता",get_advice:"मेरी सलाह →",advice_label:"अगले कदम",advice_title:"अपनी प्राथमिकता चुनें",about_eyebrow:"RYTHUCROP के बारे में",about_title:"बेहतर कृषि फैसलों के लिए सरल तकनीक",about_desc:"RythuCrop किसान-अनुकूल इंटरफेस को मौजूदा ML models से जोड़ता है.",about_ml:"मशीन लर्निंग",about_ml_desc:"फसल सुझाव और उपज अनुमान के लिए प्रशिक्षित मॉडल.",about_farmer:"किसान पहले",about_farmer_desc:"सरल विकल्प और स्पष्ट परिणाम.",about_mobile:"मोबाइल अनुकूल",about_mobile_desc:"मोबाइल, टैबलेट और डेस्कटॉप पर अनुकूलित.",footer_desc:"मशीन लर्निंग आधारित स्मार्ट कृषि."},
+  ta:{nav_home:"முகப்பு",nav_planning:"விவசாய திட்டம்",nav_crop:"பயிர் பரிந்துரை",nav_yield:"மகசூல் கணிப்பு",nav_advisory:"ஸ்மார்ட் ஆலோசனை",nav_about:"பற்றி",hero_badge:"ஸ்மார்ட் விவசாயம் • மெஷின் லேர்னிங்",hero_title1:"ஸ்மார்ட் விவசாயம்.",hero_title2:"சிறந்த முடிவுகள்.",hero_desc:"விவசாய தரவு மற்றும் மெஷின் லேர்னிங் மூலம் சரியான பயிரையும் மகசூலையும் தேர்வு செய்ய RythuCrop உதவுகிறது.",hero_btn1:"திட்டத்தை தொடங்கு →",hero_btn2:"பயிர் பரிந்துரை",hero_card_title:"விவசாய முடிவு உதவி",hero_card_main:"மண்ணிலிருந்து அறுவடை வரை",hero_card_desc:"உங்கள் தேவைகளை உள்ளிட்டு பயனுள்ள பரிந்துரைகளைப் பெறுங்கள்.",plan_eyebrow:"விவசாய திட்டம்",plan_title:"உங்கள் பண்ணையைப் பற்றி கூறுங்கள்",plan_desc:"எளிய விருப்பங்களைத் தேர்வு செய்து தொடக்கத் திட்டத்தைப் பெறுங்கள்.",land:"நிலப்பரப்பு (ஏக்கர்)",season:"பருவம்",soil:"மண் வகை",irrigation:"நீர்ப்பாசனம்",goal:"முக்கிய நோக்கம்",experience:"விவசாய அனுபவம்",generate_plan:"என் திட்டத்தை உருவாக்கு →",plan_result_label:"உங்கள் தொடக்கத் திட்டம்",plan_result_title:"பரிந்துரைகள் இங்கே வரும்",plan_result_desc:"தேவைகளைத் தேர்வு செய்து திட்டத்தை உருவாக்குங்கள்.",crop_eyebrow:"பயிர் பரிந்துரை",crop_title:"சரியான பயிரைக் கண்டறியுங்கள்",crop_desc:"மண் மற்றும் காலநிலை மதிப்புகளை உள்ளிடுங்கள்.",nitrogen:"நைட்ரஜன் (N)",phosphorus:"பாஸ்பரஸ் (P)",potassium:"பொட்டாசியம் (K)",temperature:"வெப்பநிலை (°C)",humidity:"ஈரப்பதம் (%)",soil_ph:"மண் pH",rainfall:"மழைப்பொழிவு (mm)",recommend_btn:"பயிரை பரிந்துரைக்கவும் →",recommended:"பரிந்துரைக்கப்பட்ட பயிர்",crop_result_desc:"உள்ளிட்ட மதிப்புகளின் அடிப்படையில்.",yield_eyebrow:"மகசூல் கணிப்பு",yield_title:"மகசூலை கணிக்கவும்",yield_desc:"தேவையான விவசாய தகவலை உள்ளிடுங்கள்.",yield_crop:"பயிர்",crop_year:"பயிர் ஆண்டு",yield_season:"பருவம்",state:"மாநிலம்",area:"பரப்பளவு (ஹெக்டேர்)",production:"உற்பத்தி (டன்)",annual_rainfall:"ஆண்டு மழைப்பொழிவு (mm)",fertilizer:"உரம் (kg)",pesticide:"பூச்சிக்கொல்லி (kg)",yield_btn:"மகசூலை கணிக்கவும் →",predicted:"கணிக்கப்பட்ட மகசூல்",yield_result_desc:"பயிற்சி பெற்ற ML மாதிரியின் அடிப்படையில்.",advisory_eyebrow:"ஸ்மார்ட் ஆலோசனை",advisory_title:"அடுத்து என்ன செய்ய வேண்டும்?",advisory_desc:"பயிர் மற்றும் முன்னுரிமையைத் தேர்ந்தெடுக்கவும்.",advisory_crop:"பயிர்",advisory_priority:"முன்னுரிமை",get_advice:"என் ஆலோசனை →",advice_label:"அடுத்த நடவடிக்கைகள்",advice_title:"உங்கள் முன்னுரிமையைத் தேர்ந்தெடுக்கவும்",about_eyebrow:"RYTHUCROP பற்றி",about_title:"சிறந்த விவசாய முடிவுகளுக்கான எளிய தொழில்நுட்பம்",about_desc:"விவசாயிகளுக்கான எளிய interface மற்றும் ML models இணைக்கப்பட்டுள்ளது.",about_ml:"மெஷின் லேர்னிங்",about_ml_desc:"பயிர் பரிந்துரை மற்றும் மகசூல் கணிப்புக்கு பயிற்சி பெற்ற மாதிரிகள்.",about_farmer:"விவசாயி முதலில்",about_farmer_desc:"எளிய தேர்வுகள் மற்றும் தெளிவான முடிவுகள்.",about_mobile:"மொபைல் நட்பு",about_mobile_desc:"மொபைல், டேப்லெட் மற்றும் டெஸ்க்டாப்பில் இயங்கும்.",footer_desc:"மெஷின் லேர்னிங் அடிப்படையிலான ஸ்மார்ட் விவசாயம்."}
+};
+
+// The four additional Indian-language UI sets are filled with translated labels/options below.
+langCore.kn={nav_home:"ಮುಖಪುಟ",nav_planning:"ಕೃಷಿ ಯೋಜನೆ",nav_crop:"ಬೆಳೆ ಶಿಫಾರಸು",nav_yield:"ಇಳುವರಿ ಅಂದಾಜು",nav_advisory:"ಸ್ಮಾರ್ಟ್ ಸಲಹೆ",nav_about:"ನಮ್ಮ ಬಗ್ಗೆ",hero_badge:"ಸ್ಮಾರ್ಟ್ ಕೃಷಿ • ಮೆಷಿನ್ ಲರ್ನಿಂಗ್",hero_title1:"ಸ್ಮಾರ್ಟ್ ಕೃಷಿ.",hero_title2:"ಉತ್ತಮ ನಿರ್ಧಾರಗಳು.",hero_desc:"ಕೃಷಿ ದತ್ತಾಂಶ ಮತ್ತು ಮೆಷಿನ್ ಲರ್ನಿಂಗ್ ಬಳಸಿ ಸರಿಯಾದ ಬೆಳೆ ಆಯ್ಕೆ ಮತ್ತು ಇಳುವರಿ ಅಂದಾಜಿಗೆ RythuCrop ಸಹಾಯ ಮಾಡುತ್ತದೆ.",hero_btn1:"ಕೃಷಿ ಯೋಜನೆ ಪ್ರಾರಂಭಿಸಿ →",hero_btn2:"ಬೆಳೆ ಶಿಫಾರಸು ಪಡೆಯಿರಿ",hero_card_title:"ಕೃಷಿ ನಿರ್ಧಾರ ಸಹಾಯ",hero_card_main:"ಮಣ್ಣಿನಿಂದ ಕೊಯ್ಲುವರೆಗೆ",hero_card_desc:"ನಿಮ್ಮ ಕೃಷಿ ಅಗತ್ಯಗಳನ್ನು ನಮೂದಿಸಿ ಉಪಯುಕ್ತ ಸಲಹೆಗಳನ್ನು ಪಡೆಯಿರಿ.",plan_eyebrow:"ಕೃಷಿ ಯೋಜನೆ",plan_title:"ನಿಮ್ಮ ಹೊಲದ ಬಗ್ಗೆ ತಿಳಿಸಿ",plan_desc:"ಸರಳ ಆಯ್ಕೆಗಳನ್ನು ಮಾಡಿ ಮತ್ತು ಆರಂಭಿಕ ಯೋಜನೆಯನ್ನು ಪಡೆಯಿರಿ.",land:"ಭೂಮಿ ವಿಸ್ತೀರ್ಣ (ಎಕರೆ)",season:"ಋತು",soil:"ಮಣ್ಣಿನ ವಿಧ",irrigation:"ನೀರಾವರಿ",goal:"ಮುಖ್ಯ ಗುರಿ",experience:"ಕೃಷಿ ಅನುಭವ",generate_plan:"ನನ್ನ ಯೋಜನೆ ರಚಿಸಿ →",plan_result_label:"ನಿಮ್ಮ ಆರಂಭಿಕ ಯೋಜನೆ",plan_result_title:"ನಿಮ್ಮ ಸಲಹೆಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ",plan_result_desc:"ನಿಮ್ಮ ಅಗತ್ಯಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡಿ ಯೋಜನೆ ರಚಿಸಿ.",crop_eyebrow:"ಬೆಳೆ ಶಿಫಾರಸು",crop_title:"ಸರಿಯಾದ ಬೆಳೆ ಕಂಡುಹಿಡಿಯಿರಿ",crop_desc:"ಮಣ್ಣು ಮತ್ತು ಹವಾಮಾನ ಮೌಲ್ಯಗಳನ್ನು ನಮೂದಿಸಿ.",nitrogen:"ನೈಟ್ರೋಜನ್ (N)",phosphorus:"ಫಾಸ್ಫರಸ್ (P)",potassium:"ಪೊಟ್ಯಾಸಿಯಮ್ (K)",temperature:"ತಾಪಮಾನ (°C)",humidity:"ತೇವಾಂಶ (%)",soil_ph:"ಮಣ್ಣಿನ pH",rainfall:"ಮಳೆಯ ಪ್ರಮಾಣ (mm)",recommend_btn:"ಬೆಳೆ ಶಿಫಾರಸು ಮಾಡಿ →",recommended:"ಶಿಫಾರಸು ಮಾಡಿದ ಬೆಳೆ",crop_result_desc:"ನೀವು ನೀಡಿದ ಮಣ್ಣು ಮತ್ತು ಹವಾಮಾನ ಮೌಲ್ಯಗಳ ಆಧಾರದ ಮೇಲೆ.",yield_eyebrow:"ಇಳುವರಿ ಅಂದಾಜು",yield_title:"ನಿಮ್ಮ ಬೆಳೆ ಇಳುವರಿಯನ್ನು ಅಂದಾಜಿಸಿ",yield_desc:"ಇಳುವರಿ ಮಾದರಿಗೆ ಅಗತ್ಯವಾದ ಕೃಷಿ ಮಾಹಿತಿಯನ್ನು ನೀಡಿ.",yield_crop:"ಬೆಳೆ",crop_year:"ಬೆಳೆ ವರ್ಷ",yield_season:"ಋತು",state:"ರಾಜ್ಯ",area:"ವಿಸ್ತೀರ್ಣ (ಹೆಕ್ಟೇರ್)",production:"ಉತ್ಪಾದನೆ (ಟನ್)",annual_rainfall:"ವಾರ್ಷಿಕ ಮಳೆ (mm)",fertilizer:"ರಸಗೊಬ್ಬರ (kg)",pesticide:"ಕೀಟನಾಶಕ (kg)",yield_btn:"ಬೆಳೆ ಇಳುವರಿ ಅಂದಾಜಿಸಿ →",predicted:"ಅಂದಾಜು ಬೆಳೆ ಇಳುವರಿ",yield_result_desc:"ತರಬೇತಿ ಪಡೆದ ಮೆಷಿನ್ ಲರ್ನಿಂಗ್ ಮಾದರಿಯ ಆಧಾರದ ಮೇಲೆ.",advisory_eyebrow:"ಸ್ಮಾರ್ಟ್ ಸಲಹೆ",advisory_title:"ಮುಂದೆ ನಾನು ಏನು ಮಾಡಬೇಕು?",advisory_desc:"ಬೆಳೆ ಮತ್ತು ಆದ್ಯತೆಯನ್ನು ಆಯ್ಕೆ ಮಾಡಿ. ಸರಳ ಕ್ರಮಗಳ ಪಟ್ಟಿಯನ್ನು ಪಡೆಯಿರಿ.",advisory_crop:"ಬೆಳೆ",advisory_priority:"ಆದ್ಯತೆ",get_advice:"ನನ್ನ ಸಲಹೆ ಪಡೆಯಿರಿ →",advice_label:"ಮುಂದಿನ ಕ್ರಮಗಳು",advice_title:"ನಿಮ್ಮ ಆದ್ಯತೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ",about_eyebrow:"RYTHUCROP ಬಗ್ಗೆ",about_title:"ಉತ್ತಮ ಕೃಷಿ ನಿರ್ಧಾರಗಳಿಗೆ ಸರಳ ತಂತ್ರಜ್ಞಾನ",about_desc:"RythuCrop ರೈತ ಸ್ನೇಹಿ ಇಂಟರ್‌ಫೇಸ್ ಅನ್ನು ML ಮಾದರಿಗಳೊಂದಿಗೆ ಸಂಪರ್ಕಿಸುತ್ತದೆ.",about_ml:"ಮೆಷಿನ್ ಲರ್ನಿಂಗ್",about_ml_desc:"ಬೆಳೆ ಶಿಫಾರಸು ಮತ್ತು ಇಳುವರಿ ಅಂದಾಜಿಗೆ ತರಬೇತಿ ಪಡೆದ ಮಾದರಿಗಳು.",about_farmer:"ರೈತ ಮೊದಲು",about_farmer_desc:"ಸರಳ ಆಯ್ಕೆಗಳು ಮತ್ತು ಸ್ಪಷ್ಟ ಫಲಿತಾಂಶಗಳು.",about_mobile:"ಮೊಬೈಲ್ ಸ್ನೇಹಿ",about_mobile_desc:"ಮೊಬೈಲ್, ಟ್ಯಾಬ್ಲೆಟ್ ಮತ್ತು ಡೆಸ್ಕ್‌ಟಾಪ್‌ಗೆ ಹೊಂದಿಕೊಳ್ಳುತ್ತದೆ.",footer_desc:"ಮೆಷಿನ್ ಲರ್ನಿಂಗ್ ಆಧಾರಿತ ಸ್ಮಾರ್ಟ್ ಕೃಷಿ."};
+langCore.ml={nav_home:"ഹോം",nav_planning:"കൃഷി പദ്ധതി",nav_crop:"വിള ശുപാർശ",nav_yield:"വിളവ് പ്രവചനം",nav_advisory:"സ്മാർട്ട് ഉപദേശം",nav_about:"ഞങ്ങളെക്കുറിച്ച്",hero_badge:"സ്മാർട്ട് കൃഷി • മെഷീൻ ലേണിംഗ്",hero_title1:"സ്മാർട്ട് കൃഷി.",hero_title2:"മികച്ച തീരുമാനങ്ങൾ.",hero_desc:"കൃഷി ഡാറ്റയും മെഷീൻ ലേണിംഗും ഉപയോഗിച്ച് അനുയോജ്യമായ വിള തിരഞ്ഞെടുക്കാനും വിളവ് കണക്കാക്കാനും RythuCrop സഹായിക്കുന്നു.",hero_btn1:"കൃഷി പദ്ധതി ആരംഭിക്കുക →",hero_btn2:"വിള ശുപാർശ നേടുക",hero_card_title:"കൃഷി തീരുമാന സഹായം",hero_card_main:"മണ്ണിൽ നിന്ന് വിളവെടുപ്പിലേക്ക്",hero_card_desc:"നിങ്ങളുടെ കൃഷി ആവശ്യങ്ങൾ നൽകുകയും പ്രായോഗിക നിർദേശങ്ങൾ നേടുകയും ചെയ്യുക.",plan_eyebrow:"കൃഷി പദ്ധതി",plan_title:"നിങ്ങളുടെ കൃഷിയിടത്തെക്കുറിച്ച് പറയൂ",plan_desc:"ലളിതമായ ഓപ്ഷനുകൾ തിരഞ്ഞെടുക്കുക. തുടക്ക പദ്ധതി നേടുക.",land:"ഭൂവിസ്തീർണം (ഏക്കർ)",season:"സീസൺ",soil:"മണ്ണിന്റെ തരം",irrigation:"ജലസേചനം",goal:"പ്രധാന ലക്ഷ്യം",experience:"കൃഷി പരിചയം",generate_plan:"എന്റെ പദ്ധതി തയ്യാറാക്കുക →",plan_result_label:"നിങ്ങളുടെ തുടക്ക പദ്ധതി",plan_result_title:"നിങ്ങളുടെ നിർദേശങ്ങൾ ഇവിടെ കാണാം",plan_result_desc:"ആവശ്യങ്ങൾ തിരഞ്ഞെടുക്കുകയും പദ്ധതി തയ്യാറാക്കുകയും ചെയ്യുക.",crop_eyebrow:"വിള ശുപാർശ",crop_title:"ശരിയായ വിള കണ്ടെത്തുക",crop_desc:"മണ്ണിന്റെയും കാലാവസ്ഥയുടെയും മൂല്യങ്ങൾ നൽകുക.",nitrogen:"നൈട്രജൻ (N)",phosphorus:"ഫോസ്ഫറസ് (P)",potassium:"പൊട്ടാസ്യം (K)",temperature:"താപനില (°C)",humidity:"ഈർപ്പം (%)",soil_ph:"മണ്ണിന്റെ pH",rainfall:"മഴ (mm)",recommend_btn:"വിള ശുപാർശ ചെയ്യുക →",recommended:"ശുപാർശ ചെയ്ത വിള",crop_result_desc:"നൽകിയ മൂല്യങ്ങളുടെ അടിസ്ഥാനത്തിൽ.",yield_eyebrow:"വിളവ് പ്രവചനം",yield_title:"നിങ്ങളുടെ വിളവ് കണക്കാക്കുക",yield_desc:"വിളവ് മോഡലിന് ആവശ്യമായ കൃഷി വിവരങ്ങൾ നൽകുക.",yield_crop:"വിള",crop_year:"വിള വർഷം",yield_season:"സീസൺ",state:"സംസ്ഥാനം",area:"വിസ്തീർണം (ഹെക്ടർ)",production:"ഉത്പാദനം (ടൺ)",annual_rainfall:"വാർഷിക മഴ (mm)",fertilizer:"വളം (kg)",pesticide:"കീടനാശിനി (kg)",yield_btn:"വിളവ് പ്രവചിക്കുക →",predicted:"പ്രവചിച്ച വിളവ്",yield_result_desc:"പരിശീലിപ്പിച്ച മെഷീൻ ലേണിംഗ് മോഡലിന്റെ അടിസ്ഥാനത്തിൽ.",advisory_eyebrow:"സ്മാർട്ട് ഉപദേശം",advisory_title:"അടുത്തതായി എന്ത് ചെയ്യണം?",advisory_desc:"വിളയും മുൻഗണനയും തിരഞ്ഞെടുക്കുക.",advisory_crop:"വിള",advisory_priority:"മുൻഗണന",get_advice:"എന്റെ ഉപദേശം നേടുക →",advice_label:"അടുത്ത പ്രവർത്തനങ്ങൾ",advice_title:"നിങ്ങളുടെ മുൻഗണന തിരഞ്ഞെടുക്കുക",about_eyebrow:"RYTHUCROPയെക്കുറിച്ച്",about_title:"മികച്ച കൃഷി തീരുമാനങ്ങൾക്ക് ലളിത സാങ്കേതികവിദ്യ",about_desc:"RythuCrop കർഷക സൗഹൃദ ഇന്റർഫേസിനെ ML മോഡലുകളുമായി ബന്ധിപ്പിക്കുന്നു.",about_ml:"മെഷീൻ ലേണിംഗ്",about_ml_desc:"വിള ശുപാർശയ്ക്കും വിളവ് പ്രവചനത്തിനും പരിശീലിപ്പിച്ച മോഡലുകൾ ഉപയോഗിക്കുന്നു.",about_farmer:"കർഷകൻ ആദ്യം",about_farmer_desc:"ലളിതമായ തിരഞ്ഞെടുപ്പുകളും വ്യക്തമായ ഫലങ്ങളും.",about_mobile:"മൊബൈൽ സൗഹൃദം",about_mobile_desc:"മൊബൈൽ, ടാബ്ലെറ്റ്, ഡെസ്ക്ടോപ്പ് എന്നിവയ്ക്ക് അനുയോജ്യം.",footer_desc:"മെഷീൻ ലേണിംഗ് അടിസ്ഥാനമാക്കിയുള്ള സ്മാർട്ട് കൃഷി."};
+langCore.mr={nav_home:"मुख्यपृष्ठ",nav_planning:"शेती नियोजन",nav_crop:"पीक शिफारस",nav_yield:"उत्पादन अंदाज",nav_advisory:"स्मार्ट सल्ला",nav_about:"आमच्याबद्दल",hero_badge:"स्मार्ट शेती • मशीन लर्निंग",hero_title1:"स्मार्ट शेती.",hero_title2:"चांगले निर्णय.",hero_desc:"कृषी डेटा आणि मशीन लर्निंगच्या मदतीने योग्य पीक निवडण्यासाठी व उत्पादनाचा अंदाज घेण्यासाठी RythuCrop मदत करते.",hero_btn1:"शेती नियोजन सुरू करा →",hero_btn2:"पीक शिफारस मिळवा",hero_card_title:"शेती निर्णय सहाय्य",hero_card_main:"मातीपासून कापणीपर्यंत",hero_card_desc:"तुमच्या शेतीच्या गरजा भरा आणि उपयुक्त सूचना मिळवा.",plan_eyebrow:"शेती नियोजन",plan_title:"तुमच्या शेताबद्दल सांगा",plan_desc:"सोपे पर्याय निवडा आणि सुरुवातीची योजना मिळवा.",land:"जमिनीचे क्षेत्रफळ (एकर)",season:"हंगाम",soil:"मातीचा प्रकार",irrigation:"सिंचन",goal:"मुख्य उद्दिष्ट",experience:"शेतीचा अनुभव",generate_plan:"माझी योजना तयार करा →",plan_result_label:"तुमची सुरुवातीची योजना",plan_result_title:"तुमच्या सूचना येथे दिसतील",plan_result_desc:"गरजा निवडा आणि योजना तयार करा.",crop_eyebrow:"पीक शिफारस",crop_title:"योग्य पीक शोधा",crop_desc:"माती आणि हवामानाची मूल्ये भरा.",nitrogen:"नायट्रोजन (N)",phosphorus:"फॉस्फरस (P)",potassium:"पोटॅशियम (K)",temperature:"तापमान (°C)",humidity:"आर्द्रता (%)",soil_ph:"माती pH",rainfall:"पाऊस (mm)",recommend_btn:"पीक शिफारस करा →",recommended:"शिफारस केलेले पीक",crop_result_desc:"दिलेल्या मूल्यांवर आधारित.",yield_eyebrow:"उत्पादन अंदाज",yield_title:"तुमच्या पिकाचे उत्पादन अंदाजित करा",yield_desc:"उत्पादन मॉडेलसाठी आवश्यक कृषी माहिती द्या.",yield_crop:"पीक",crop_year:"पीक वर्ष",yield_season:"हंगाम",state:"राज्य",area:"क्षेत्रफळ (हेक्टर)",production:"उत्पादन (टन)",annual_rainfall:"वार्षिक पाऊस (mm)",fertilizer:"खत (kg)",pesticide:"कीटकनाशक (kg)",yield_btn:"उत्पादनाचा अंदाज घ्या →",predicted:"अंदाजित पीक उत्पादन",yield_result_desc:"प्रशिक्षित मशीन लर्निंग मॉडेलच्या आधारे.",advisory_eyebrow:"स्मार्ट सल्ला",advisory_title:"आता काय करावे?",advisory_desc:"पीक आणि प्राधान्य निवडा आणि सोपी कृती यादी मिळवा.",advisory_crop:"पीक",advisory_priority:"प्राधान्य",get_advice:"माझा सल्ला घ्या →",advice_label:"पुढील कृती",advice_title:"तुमचे प्राधान्य निवडा",about_eyebrow:"RYTHUCROP बद्दल",about_title:"चांगल्या शेती निर्णयांसाठी सोपे तंत्रज्ञान",about_desc:"RythuCrop शेतकरी-अनुकूल इंटरफेसला ML मॉडेल्सशी जोडते.",about_ml:"मशीन लर्निंग",about_ml_desc:"पीक शिफारस आणि उत्पादन अंदाजासाठी प्रशिक्षित मॉडेल्स वापरले जातात.",about_farmer:"शेतकरी प्रथम",about_farmer_desc:"सोपे पर्याय आणि स्पष्ट परिणाम.",about_mobile:"मोबाईल अनुकूल",about_mobile_desc:"मोबाईल, टॅबलेट आणि डेस्कटॉपसाठी अनुकूल.",footer_desc:"मशीन लर्निंग आधारित स्मार्ट शेती."};
+langCore.bn={nav_home:"হোম",nav_planning:"কৃষি পরিকল্পনা",nav_crop:"ফসলের পরামর্শ",nav_yield:"ফলন পূর্বাভাস",nav_advisory:"স্মার্ট পরামর্শ",nav_about:"আমাদের সম্পর্কে",hero_badge:"স্মার্ট কৃষি • মেশিন লার্নিং",hero_title1:"স্মার্ট কৃষি.",hero_title2:"আরও ভালো সিদ্ধান্ত.",hero_desc:"কৃষি তথ্য ও মেশিন লার্নিং ব্যবহার করে উপযুক্ত ফসল বেছে নিতে এবং ফলন অনুমান করতে RythuCrop সাহায্য করে।",hero_btn1:"কৃষি পরিকল্পনা শুরু করুন →",hero_btn2:"ফসলের পরামর্শ নিন",hero_card_title:"কৃষি সিদ্ধান্ত সহায়তা",hero_card_main:"মাটি থেকে ফসল তোলা পর্যন্ত",hero_card_desc:"আপনার কৃষি প্রয়োজন লিখুন এবং ব্যবহারিক পরামর্শ পান।",plan_eyebrow:"কৃষি পরিকল্পনা",plan_title:"আপনার জমি সম্পর্কে বলুন",plan_desc:"সহজ বিকল্প বেছে নিয়ে একটি প্রাথমিক পরিকল্পনা পান।",land:"জমির পরিমাণ (একর)",season:"মৌসুম",soil:"মাটির ধরন",irrigation:"সেচ",goal:"প্রধান লক্ষ্য",experience:"কৃষি অভিজ্ঞতা",generate_plan:"আমার পরিকল্পনা তৈরি করুন →",plan_result_label:"আপনার প্রাথমিক পরিকল্পনা",plan_result_title:"আপনার পরামর্শ এখানে দেখা যাবে",plan_result_desc:"প্রয়োজনীয় বিকল্প বেছে নিয়ে পরিকল্পনা তৈরি করুন।",crop_eyebrow:"ফসলের পরামর্শ",crop_title:"সঠিক ফসল খুঁজুন",crop_desc:"মাটি ও আবহাওয়ার মান লিখুন।",nitrogen:"নাইট্রোজেন (N)",phosphorus:"ফসফরাস (P)",potassium:"পটাশিয়াম (K)",temperature:"তাপমাত্রা (°C)",humidity:"আর্দ্রতা (%)",soil_ph:"মাটির pH",rainfall:"বৃষ্টিপাত (mm)",recommend_btn:"ফসলের পরামর্শ দিন →",recommended:"প্রস্তাবিত ফসল",crop_result_desc:"দেওয়া মানের ভিত্তিতে।",yield_eyebrow:"ফলন পূর্বাভাস",yield_title:"আপনার ফসলের ফলন অনুমান করুন",yield_desc:"ফলন মডেলের জন্য প্রয়োজনীয় কৃষি তথ্য দিন।",yield_crop:"ফসল",crop_year:"ফসলের বছর",yield_season:"মৌসুম",state:"রাজ্য",area:"জমির পরিমাণ (হেক্টর)",production:"উৎপাদন (টন)",annual_rainfall:"বার্ষিক বৃষ্টিপাত (mm)",fertilizer:"সার (kg)",pesticide:"কীটনাশক (kg)",yield_btn:"ফলন অনুমান করুন →",predicted:"অনুমানিত ফসলের ফলন",yield_result_desc:"প্রশিক্ষিত মেশিন লার্নিং মডেলের ভিত্তিতে।",advisory_eyebrow:"স্মার্ট পরামর্শ",advisory_title:"এরপর কী করব?",advisory_desc:"ফসল ও অগ্রাধিকার বেছে নিয়ে সহজ করণীয় তালিকা পান।",advisory_crop:"ফসল",advisory_priority:"অগ্রাধিকার",get_advice:"আমার পরামর্শ →",advice_label:"পরবর্তী পদক্ষেপ",advice_title:"আপনার অগ্রাধিকার বেছে নিন",about_eyebrow:"RYTHUCROP সম্পর্কে",about_title:"ভালো কৃষি সিদ্ধান্তের জন্য সহজ প্রযুক্তি",about_desc:"RythuCrop কৃষক-বান্ধব ইন্টারফেসকে ML মডেলের সঙ্গে যুক্ত করে।",about_ml:"মেশিন লার্নিং",about_ml_desc:"ফসলের পরামর্শ ও ফলন পূর্বাভাসের জন্য প্রশিক্ষিত মডেল ব্যবহার করা হয়।",about_farmer:"কৃষক প্রথম",about_farmer_desc:"সহজ বিকল্প ও পরিষ্কার ফলাফলের জন্য তৈরি।",about_mobile:"মোবাইল উপযোগী",about_mobile_desc:"মোবাইল, ট্যাবলেট ও ডেস্কটপে মানিয়ে যায়।",footer_desc:"মেশিন লার্নিং ভিত্তিক স্মার্ট কৃষি."};
+
+langCore.od={nav_home:"ମୁଖ୍ୟ ପୃଷ୍ଠା",nav_planning:"କୃଷି ଯୋଜନା",nav_crop:"ଫସଲ ସୁପାରିଶ",nav_yield:"ଅମଳ ଅନୁମାନ",nav_advisory:"ସ୍ମାର୍ଟ ପରାମର୍ଶ",nav_about:"ଆମ ବିଷୟରେ",hero_badge:"ସ୍ମାର୍ଟ କୃଷି • ମେସିନ ଲର୍ଣ୍ଣିଂ",hero_title1:"ସ୍ମାର୍ଟ କୃଷି.",hero_title2:"ଭଲ ନିଷ୍ପତ୍ତି.",hero_desc:"କୃଷି ତଥ୍ୟ ଏବଂ ମେସିନ ଲର୍ଣ୍ଣିଂ ବ୍ୟବହାର କରି ଉପଯୁକ୍ତ ଫସଲ ବାଛିବା ଓ ଅମଳ ଅନୁମାନ କରିବାରେ RythuCrop ସାହାଯ୍ୟ କରେ.",hero_btn1:"କୃଷି ଯୋଜନା ଆରମ୍ଭ କରନ୍ତୁ →",hero_btn2:"ଫସଲ ସୁପାରିଶ ପାଆନ୍ତୁ",hero_card_title:"କୃଷି ନିଷ୍ପତ୍ତି ସହାୟତା",hero_card_main:"ମାଟିରୁ ଅମଳ ପର୍ଯ୍ୟନ୍ତ",hero_card_desc:"ଆପଣଙ୍କ କୃଷି ଆବଶ୍ୟକତା ଦିଅନ୍ତୁ ଏବଂ ସରଳ ପରାମର୍ଶ ପାଆନ୍ତୁ.",plan_eyebrow:"କୃଷି ଯୋଜନା",plan_title:"ଆପଣଙ୍କ ଜମି ବିଷୟରେ କୁହନ୍ତୁ",plan_desc:"ସରଳ ବିକଳ୍ପ ବାଛନ୍ତୁ ଏବଂ ଆପଣଙ୍କ ଆବଶ୍ୟକତା ଅନୁସାରେ ଯୋଜନା ପାଆନ୍ତୁ.",land:"ଜମିର କ୍ଷେତ୍ରଫଳ (ଏକର)",season:"ଋତୁ",soil:"ମାଟିର ପ୍ରକାର",irrigation:"ଜଳସେଚନ",goal:"ମୁଖ୍ୟ ଲକ୍ଷ୍ୟ",experience:"କୃଷି ଅଭିଜ୍ଞତା",generate_plan:"ମୋ ଯୋଜନା ତିଆରି କରନ୍ତୁ →",crop_eyebrow:"ଫସଲ ସୁପାରିଶ",crop_title:"ଠିକ୍ ଫସଲ ଖୋଜନ୍ତୁ",crop_desc:"ପ୍ରଶିକ୍ଷିତ ମଡେଲ ପାଇଁ ମାଟି ଓ ଜଳବାୟୁର ମୂଲ୍ୟ ଦିଅନ୍ତୁ.",nitrogen:"ନାଇଟ୍ରୋଜେନ (N)",phosphorus:"ଫସ୍ଫରସ (P)",potassium:"ପୋଟାସିୟମ (K)",temperature:"ତାପମାତ୍ରା (°C)",humidity:"ଆର୍ଦ୍ରତା (%)",soil_ph:"ମାଟି pH",rainfall:"ବର୍ଷା (mm)",recommend_btn:"ଫସଲ ସୁପାରିଶ କରନ୍ତୁ →",recommended:"ସୁପାରିଶ କରାଯାଇଥିବା ଫସଲ",crop_result_desc:"ଦିଆଯାଇଥିବା ମାଟି ଓ ଜଳବାୟୁ ମୂଲ୍ୟ ଆଧାରରେ.",yield_eyebrow:"ଅମଳ ଅନୁମାନ",yield_title:"ଆପଣଙ୍କ ଫସଲର ଅମଳ ଅନୁମାନ କରନ୍ତୁ",yield_desc:"ଅମଳ ମଡେଲ ପାଇଁ ଆବଶ୍ୟକ କୃଷି ସୂଚନା ଦିଅନ୍ତୁ.",yield_crop:"ଫସଲ",crop_year:"ଫସଲ ବର୍ଷ",yield_season:"ଋତୁ",state:"ରାଜ୍ୟ",area:"କ୍ଷେତ୍ରଫଳ (ହେକ୍ଟର)",production:"ଉତ୍ପାଦନ (ଟନ)",annual_rainfall:"ବାର୍ଷିକ ବର୍ଷା (mm)",fertilizer:"ସାର (kg)",pesticide:"କୀଟନାଶକ (kg)",yield_btn:"ଫସଲ ଅମଳ ଅନୁମାନ କରନ୍ତୁ →",predicted:"ଅନୁମାନିତ ଫସଲ ଅମଳ",yield_result_desc:"ପ୍ରଶିକ୍ଷିତ ମେସିନ ଲର୍ଣ୍ଣିଂ ମଡେଲ ଆଧାରରେ.",advisory_eyebrow:"ସ୍ମାର୍ଟ ପରାମର୍ଶ",advisory_title:"ଏବେ କଣ କରିବି?",advisory_desc:"ଫସଲ ଓ ପ୍ରାଥମିକତା ବାଛନ୍ତୁ ଏବଂ ସରଳ କାର୍ଯ୍ୟ ତାଲିକା ପାଆନ୍ତୁ.",advisory_crop:"ଫସଲ",advisory_priority:"ପ୍ରାଥମିକତା",get_advice:"ମୋ ପରାମର୍ଶ ପାଆନ୍ତୁ →",advice_label:"ପରବର୍ତ୍ତୀ କାର୍ଯ୍ୟ",advice_title:"ଆପଣଙ୍କ ପ୍ରାଥମିକତା ବାଛନ୍ତୁ",about_eyebrow:"RYTHUCROP ବିଷୟରେ",about_title:"ଭଲ କୃଷି ନିଷ୍ପତ୍ତି ପାଇଁ ସରଳ ପ୍ରଯୁକ୍ତି",about_desc:"RythuCrop କୃଷକ-ସହଜ ଇଣ୍ଟରଫେସକୁ ପ୍ରକଳ୍ପର ମେସିନ ଲର୍ଣ୍ଣିଂ ମଡେଲ ସହିତ ଯୋଡ଼େ.",about_ml:"ମେସିନ ଲର୍ଣ୍ଣିଂ",about_ml_desc:"ଫସଲ ସୁପାରିଶ ଓ ଅମଳ ଅନୁମାନ ପାଇଁ ପ୍ରଶିକ୍ଷିତ ମଡେଲ ବ୍ୟବହାର କରାଯାଏ.",about_farmer:"କୃଷକ ପ୍ରଥମେ",about_farmer_desc:"ସରଳ ବିକଳ୍ପ ଏବଂ ସ୍ପଷ୍ଟ ଫଳାଫଳ.",about_mobile:"ମୋବାଇଲ ସହଜ",about_mobile_desc:"ମୋବାଇଲ, ଟାବଲେଟ ଓ ଡେସ୍କଟପ ପାଇଁ ଉପଯୁକ୍ତ.",footer_desc:"ମେସିନ ଲର୍ଣ୍ଣିଂ ଆଧାରିତ ସ୍ମାର୍ଟ କୃଷି.",season_kharif:"ଖରିଫ",season_rabi:"ରବି",season_summer:"ଗ୍ରୀଷ୍ମ",soil_loamy:"ଦୋଆଶ",soil_black:"କଳା ମାଟି",soil_red:"ଲାଲ ମାଟି",soil_clay:"କାଦୁଆ ମାଟି",soil_sandy:"ବାଲୁକା ମାଟି",water_good:"ଭଲ ଜଳ ଉପଲବ୍ଧତା",water_moderate:"ମଧ୍ୟମ ଜଳ ଉପଲବ୍ଧତା",water_low:"କମ୍ ଜଳ ଉପଲବ୍ଧତା",water_rainfed:"ବର୍ଷା ନିର୍ଭର",goal_yield:"ଅଧିକ ଅମଳ",goal_water:"କମ୍ ଜଳ ବ୍ୟବହାର",goal_cost:"କମ୍ ଇନପୁଟ ଖର୍ଚ୍ଚ",goal_balanced:"ସନ୍ତୁଳିତ କୃଷି",exp_beginner:"ଆରମ୍ଭିକ",exp_some:"କିଛି ଅଭିଜ୍ଞତା",exp_experienced:"ଅଭିଜ୍ଞ",crop_rice:"ଧାନ",crop_wheat:"ଗହମ",crop_maize:"ମକା",crop_cotton:"କପା",crop_groundnut:"ଚିନାବାଦାମ",crop_chickpea:"ଚଣା",priority_water:"ଜଳ ସଞ୍ଚୟ",priority_fertilizer:"ସାର ପରିଚାଳନା",priority_pest:"କୀଟ ନିୟନ୍ତ୍ରଣ"};
+const opt={
+ en:{season_kharif:"Kharif",season_rabi:"Rabi",season_summer:"Summer",soil_loamy:"Loamy",soil_black:"Black Soil",soil_red:"Red Soil",soil_clay:"Clay Soil",soil_sandy:"Sandy Soil",water_good:"Good water availability",water_moderate:"Moderate water availability",water_low:"Low water availability",water_rainfed:"Rainfed",goal_yield:"Higher yield",goal_water:"Lower water use",goal_cost:"Lower input cost",goal_balanced:"Balanced farming",exp_beginner:"Beginner",exp_some:"Some experience",exp_experienced:"Experienced",crop_rice:"Rice",crop_wheat:"Wheat",crop_maize:"Maize",crop_cotton:"Cotton",crop_groundnut:"Groundnut",crop_chickpea:"Chickpea",priority_water:"Water saving",priority_fertilizer:"Fertilizer management",priority_pest:"Pest prevention"},
+ te:{season_kharif:"ఖరీఫ్",season_rabi:"రబీ",season_summer:"వేసవి",soil_loamy:"లోమీ నేల",soil_black:"నల్ల నేల",soil_red:"ఎర్ర నేల",soil_clay:"బంకమట్టి నేల",soil_sandy:"ఇసుక నేల",water_good:"మంచి నీటి సౌకర్యం",water_moderate:"మధ్యస్థ నీటి సౌకర్యం",water_low:"తక్కువ నీటి సౌకర్యం",water_rainfed:"వర్షాధార వ్యవసాయం",goal_yield:"అధిక దిగుబడి",goal_water:"తక్కువ నీటి వినియోగం",goal_cost:"తక్కువ పెట్టుబడి ఖర్చు",goal_balanced:"సమతుల్య వ్యవసాయం",exp_beginner:"ప్రారంభ స్థాయి",exp_some:"కొంత అనుభవం",exp_experienced:"అనుభవం ఉన్న రైతు",crop_rice:"వరి",crop_wheat:"గోధుమ",crop_maize:"మొక్కజొన్న",crop_cotton:"పత్తి",crop_groundnut:"వేరుశెనగ",crop_chickpea:"శనగ",priority_water:"నీటి ఆదా",priority_fertilizer:"ఎరువుల నిర్వహణ",priority_pest:"చీడపీడల నివారణ"},
+ hi:{season_kharif:"खरीफ",season_rabi:"रबी",season_summer:"गर्मी",soil_loamy:"दोमट मिट्टी",soil_black:"काली मिट्टी",soil_red:"लाल मिट्टी",soil_clay:"चिकनी मिट्टी",soil_sandy:"रेतीली मिट्टी",water_good:"अच्छी जल उपलब्धता",water_moderate:"मध्यम जल उपलब्धता",water_low:"कम जल उपलब्धता",water_rainfed:"वर्षा आधारित",goal_yield:"अधिक उपज",goal_water:"कम पानी का उपयोग",goal_cost:"कम लागत",goal_balanced:"संतुलित खेती",exp_beginner:"शुरुआती",exp_some:"कुछ अनुभव",exp_experienced:"अनुभवी",crop_rice:"चावल",crop_wheat:"गेहूं",crop_maize:"मक्का",crop_cotton:"कपास",crop_groundnut:"मूंगफली",crop_chickpea:"चना",priority_water:"पानी की बचत",priority_fertilizer:"उर्वरक प्रबंधन",priority_pest:"कीट रोकथाम"},
+ ta:{season_kharif:"காரிஃப்",season_rabi:"ரபி",season_summer:"கோடை",soil_loamy:"வண்டல் மண்",soil_black:"கரிசல் மண்",soil_red:"செம்மண்",soil_clay:"களிமண்",soil_sandy:"மணல் மண்",water_good:"நல்ல நீர் வசதி",water_moderate:"மிதமான நீர் வசதி",water_low:"குறைந்த நீர் வசதி",water_rainfed:"மழை சார்ந்தது",goal_yield:"அதிக மகசூல்",goal_water:"குறைந்த நீர் பயன்பாடு",goal_cost:"குறைந்த செலவு",goal_balanced:"சமநிலை விவசாயம்",exp_beginner:"தொடக்க நிலை",exp_some:"சில அனுபவம்",exp_experienced:"அனுபவம் உள்ளவர்",crop_rice:"நெல்",crop_wheat:"கோதுமை",crop_maize:"மக்காச்சோளம்",crop_cotton:"பருத்தி",crop_groundnut:"நிலக்கடலை",crop_chickpea:"கொண்டைக்கடலை",priority_water:"நீர் சேமிப்பு",priority_fertilizer:"உர மேலாண்மை",priority_pest:"பூச்சி தடுப்பு"},
+ kn:{season_kharif:"ಖರೀಫ್",season_rabi:"ರಬಿ",season_summer:"ಬೇಸಿಗೆ",soil_loamy:"ಲೋಮಿ ಮಣ್ಣು",soil_black:"ಕಪ್ಪು ಮಣ್ಣು",soil_red:"ಕೆಂಪು ಮಣ್ಣು",soil_clay:"ಜೇಡಿ ಮಣ್ಣು",soil_sandy:"ಮರಳು ಮಣ್ಣು",water_good:"ಉತ್ತಮ ನೀರಿನ ಲಭ್ಯತೆ",water_moderate:"ಮಧ್ಯಮ ನೀರಿನ ಲಭ್ಯತೆ",water_low:"ಕಡಿಮೆ ನೀರಿನ ಲಭ್ಯತೆ",water_rainfed:"ಮಳೆ ಆಧಾರಿತ",goal_yield:"ಹೆಚ್ಚಿನ ಇಳುವರಿ",goal_water:"ಕಡಿಮೆ ನೀರಿನ ಬಳಕೆ",goal_cost:"ಕಡಿಮೆ ವೆಚ್ಚ",goal_balanced:"ಸಮತೋಲಿತ ಕೃಷಿ",exp_beginner:"ಆರಂಭಿಕ",exp_some:"ಸ್ವಲ್ಪ ಅನುಭವ",exp_experienced:"ಅನುಭವ ಹೊಂದಿದವರು",crop_rice:"ಭತ್ತ",crop_wheat:"ಗೋಧಿ",crop_maize:"ಮೆಕ್ಕೆಜೋಳ",crop_cotton:"ಹತ್ತಿ",crop_groundnut:"ಕಡಲೆಕಾಯಿ",crop_chickpea:"ಕಡಲೆ",priority_water:"ನೀರು ಉಳಿತಾಯ",priority_fertilizer:"ರಸಗೊಬ್ಬರ ನಿರ್ವಹಣೆ",priority_pest:"ಕೀಟ ತಡೆ"},
+ ml:{season_kharif:"ഖരീഫ്",season_rabi:"റബി",season_summer:"വേനൽ",soil_loamy:"ലോമി മണ്ണ്",soil_black:"കറുത്ത മണ്ണ്",soil_red:"ചുവന്ന മണ്ണ്",soil_clay:"കളിമണ്ണ്",soil_sandy:"മണൽ മണ്ണ്",water_good:"നല്ല ജലലഭ്യത",water_moderate:"മിതമായ ജലലഭ്യത",water_low:"കുറഞ്ഞ ജലലഭ്യത",water_rainfed:"മഴയെ ആശ്രയിച്ചുള്ളത്",goal_yield:"കൂടുതൽ വിളവ്",goal_water:"കുറഞ്ഞ ജല ഉപയോഗം",goal_cost:"കുറഞ്ഞ ചെലവ്",goal_balanced:"സമതുലിത കൃഷി",exp_beginner:"തുടക്കക്കാരൻ",exp_some:"ചില പരിചയം",exp_experienced:"പരിചയസമ്പന്നൻ",crop_rice:"നെല്ല്",crop_wheat:"ഗോതമ്പ്",crop_maize:"ചോളം",crop_cotton:"പരുത്തി",crop_groundnut:"നിലക്കടല",crop_chickpea:"കടല",priority_water:"ജല സംരക്ഷണം",priority_fertilizer:"വള പരിപാലനം",priority_pest:"കീട പ്രതിരോധം"},
+ mr:{season_kharif:"खरीप",season_rabi:"रब्बी",season_summer:"उन्हाळा",soil_loamy:"गाळाची माती",soil_black:"काळी माती",soil_red:"लाल माती",soil_clay:"चिकणमाती",soil_sandy:"वालुकामय माती",water_good:"चांगली पाण्याची उपलब्धता",water_moderate:"मध्यम पाण्याची उपलब्धता",water_low:"कमी पाण्याची उपलब्धता",water_rainfed:"पावसावर आधारित",goal_yield:"जास्त उत्पादन",goal_water:"कमी पाणी वापर",goal_cost:"कमी खर्च",goal_balanced:"संतुलित शेती",exp_beginner:"नवशिक्या",exp_some:"काही अनुभव",exp_experienced:"अनुभवी",crop_rice:"तांदूळ",crop_wheat:"गहू",crop_maize:"मका",crop_cotton:"कापूस",crop_groundnut:"भुईमूग",crop_chickpea:"हरभरा",priority_water:"पाणी बचत",priority_fertilizer:"खत व्यवस्थापन",priority_pest:"कीड प्रतिबंध"},
+ bn:{season_kharif:"খরিফ",season_rabi:"রবি",season_summer:"গ্রীষ্ম",soil_loamy:"দোআঁশ মাটি",soil_black:"কালো মাটি",soil_red:"লাল মাটি",soil_clay:"এঁটেল মাটি",soil_sandy:"বেলে মাটি",water_good:"ভালো জল সুবিধা",water_moderate:"মাঝারি জল সুবিধা",water_low:"কম জল সুবিধা",water_rainfed:"বৃষ্টিনির্ভর",goal_yield:"বেশি ফলন",goal_water:"কম জল ব্যবহার",goal_cost:"কম খরচ",goal_balanced:"সুষম চাষ",exp_beginner:"শিক্ষানবিস",exp_some:"কিছু অভিজ্ঞতা",exp_experienced:"অভিজ্ঞ",crop_rice:"ধান",crop_wheat:"গম",crop_maize:"ভুট্টা",crop_cotton:"তুলা",crop_groundnut:"চিনাবাদাম",crop_chickpea:"ছোলা",priority_water:"জল সাশ্রয়",priority_fertilizer:"সার ব্যবস্থাপনা",priority_pest:"পোকা প্রতিরোধ"}
+};
+
+const placeholders={en:{ph_land:"e.g. 2",ph_crop:"e.g. 90",ph_crop_p:"e.g. 42",ph_crop_k:"e.g. 43",ph_temp:"e.g. 25",ph_humidity:"e.g. 80",ph_ph:"e.g. 6.5",ph_rainfall:"e.g. 200",ph_crop_text:"e.g. Rice",ph_year:"e.g. 2024",ph_season_text:"e.g. Kharif",ph_state:"e.g. Andhra Pradesh",ph_area:"e.g. 100",ph_production:"e.g. 500",ph_annual_rainfall:"e.g. 1200",ph_fertilizer:"e.g. 500",ph_pesticide:"e.g. 50"},te:{ph_land:"ఉదా. 2",ph_crop:"ఉదా. 90",ph_crop_p:"ఉదా. 42",ph_crop_k:"ఉదా. 43",ph_temp:"ఉదా. 25",ph_humidity:"ఉదా. 80",ph_ph:"ఉదా. 6.5",ph_rainfall:"ఉదా. 200",ph_crop_text:"ఉదా. Rice",ph_year:"ఉదా. 2024",ph_season_text:"ఉదా. ఖరీఫ్",ph_state:"ఉదా. ఆంధ్రప్రదేశ్",ph_area:"ఉదా. 100",ph_production:"ఉదా. 500",ph_annual_rainfall:"ఉదా. 1200",ph_fertilizer:"ఉదా. 500",ph_pesticide:"ఉదా. 50"},hi:{ph_land:"उदा. 2",ph_crop:"उदा. 90",ph_crop_p:"उदा. 42",ph_crop_k:"उदा. 43",ph_temp:"उदा. 25",ph_humidity:"उदा. 80",ph_ph:"उदा. 6.5",ph_rainfall:"उदा. 200",ph_crop_text:"उदा. Rice",ph_year:"उदा. 2024",ph_season_text:"उदा. खरीफ",ph_state:"उदा. आंध्र प्रदेश",ph_area:"उदा. 100",ph_production:"उदा. 500",ph_annual_rainfall:"उदा. 1200",ph_fertilizer:"उदा. 500",ph_pesticide:"उदा. 50"},ta:{ph_land:"எ.கா. 2",ph_crop:"எ.கா. 90",ph_crop_p:"எ.கா. 42",ph_crop_k:"எ.கா. 43",ph_temp:"எ.கா. 25",ph_humidity:"எ.கா. 80",ph_ph:"எ.கா. 6.5",ph_rainfall:"எ.கா. 200",ph_crop_text:"எ.கா. Rice",ph_year:"எ.கா. 2024",ph_season_text:"எ.கா. காரிஃப்",ph_state:"எ.கா. ஆந்திரப் பிரதேசம்",ph_area:"எ.கா. 100",ph_production:"எ.கா. 500",ph_annual_rainfall:"எ.கா. 1200",ph_fertilizer:"எ.கா. 500",ph_pesticide:"எ.கா. 50"},kn:{ph_land:"ಉದಾ. 2",ph_crop:"ಉದಾ. 90",ph_crop_p:"ಉದಾ. 42",ph_crop_k:"ಉದಾ. 43",ph_temp:"ಉದಾ. 25",ph_humidity:"ಉದಾ. 80",ph_ph:"ಉದಾ. 6.5",ph_rainfall:"ಉದಾ. 200",ph_crop_text:"ಉದಾ. Rice",ph_year:"ಉದಾ. 2024",ph_season_text:"ಉದಾ. ಖರೀಫ್",ph_state:"ಉದಾ. ಆಂಧ್ರ ಪ್ರದೇಶ",ph_area:"ಉದಾ. 100",ph_production:"ಉದಾ. 500",ph_annual_rainfall:"ಉದಾ. 1200",ph_fertilizer:"ಉದಾ. 500",ph_pesticide:"ಉದಾ. 50"},ml:{ph_land:"ഉദാ. 2",ph_crop:"ഉദാ. 90",ph_crop_p:"ഉദാ. 42",ph_crop_k:"ഉദാ. 43",ph_temp:"ഉദാ. 25",ph_humidity:"ഉദാ. 80",ph_ph:"ഉദാ. 6.5",ph_rainfall:"ഉദാ. 200",ph_crop_text:"ഉദാ. Rice",ph_year:"ഉദാ. 2024",ph_season_text:"ഉദാ. ഖരീഫ്",ph_state:"ഉദാ. ആന്ധ്ര പ്രദേശ്",ph_area:"ഉദാ. 100",ph_production:"ഉദാ. 500",ph_annual_rainfall:"ഉദാ. 1200",ph_fertilizer:"ഉദാ. 500",ph_pesticide:"ഉദാ. 50"},mr:{ph_land:"उदा. 2",ph_crop:"उदा. 90",ph_crop_p:"उदा. 42",ph_crop_k:"उदा. 43",ph_temp:"उदा. 25",ph_humidity:"उदा. 80",ph_ph:"उदा. 6.5",ph_rainfall:"उदा. 200",ph_crop_text:"उदा. Rice",ph_year:"उदा. 2024",ph_season_text:"उदा. खरीप",ph_state:"उदा. आंध्र प्रदेश",ph_area:"उदा. 100",ph_production:"उदा. 500",ph_annual_rainfall:"उदा. 1200",ph_fertilizer:"उदा. 500",ph_pesticide:"उदा. 50"},bn:{ph_land:"যেমন 2",ph_crop:"যেমন 90",ph_crop_p:"যেমন 42",ph_crop_k:"যেমন 43",ph_temp:"যেমন 25",ph_humidity:"যেমন 80",ph_ph:"যেমন 6.5",ph_rainfall:"যেমন 200",ph_crop_text:"যেমন Rice",ph_year:"যেমন 2024",ph_season_text:"যেমন খরিফ",ph_state:"যেমন অন্ধ্র প্রদেশ",ph_area:"যেমন 100",ph_production:"যেমন 500",ph_annual_rainfall:"যেমন 1200",ph_fertilizer:"যেমন 500",ph_pesticide:"যেমন 50"},od:{ph_land:"ଉଦା. 2",ph_crop:"ଉଦା. 90",ph_crop_p:"ଉଦା. 42",ph_crop_k:"ଉଦା. 43",ph_temp:"ଉଦା. 25",ph_humidity:"ଉଦା. 80",ph_ph:"ଉଦା. 6.5",ph_rainfall:"ଉଦା. 200",ph_crop_text:"ଉଦା. Rice",ph_year:"ଉଦା. 2024",ph_season_text:"ଉଦା. Kharif",ph_state:"ଉଦା. Andhra Pradesh",ph_area:"ଉଦା. 100",ph_production:"ଉଦା. 500",ph_annual_rainfall:"ଉଦା. 1200",ph_fertilizer:"ଉଦା. 500",ph_pesticide:"ଉଦା. 50"}};
+
+const extra={calculating:{en:"Calculating…",te:"లెక్కిస్తోంది…",hi:"गणना हो रही है…",ta:"கணக்கிடப்படுகிறது…",kn:"ಲೆಕ್ಕ ಹಾಕಲಾಗುತ್ತಿದೆ…",ml:"കണക്കാക്കുന്നു…",mr:"गणना सुरू आहे…",bn:"হিসাব করা হচ্ছে…"},prediction_failed:{en:"Prediction failed",te:"అంచనా విఫలమైంది",hi:"अनुमान विफल हुआ",ta:"கணிப்பு தோல்வியடைந்தது",kn:"ಅಂದಾಜು ವಿಫಲವಾಗಿದೆ",ml:"പ്രവചനം പരാജയപ്പെട്ടു",mr:"अंदाज अयशस्वी",bn:"পূর্বাভাস ব্যর্থ হয়েছে"},server_error:{en:"Server error",te:"సర్వర్ లోపం",hi:"सर्वर त्रुटि",ta:"சர்வர் பிழை",kn:"ಸರ್ವರ್ ದೋಷ",ml:"സെർവർ പിശക്",mr:"सर्व्हर त्रुटी",bn:"সার্ভার ত্রুটি"},plan_generated:{en:"Plan generated",te:"ప్రణాళిక సిద్ధమైంది",hi:"योजना तैयार है",ta:"திட்டம் உருவாக்கப்பட்டது",kn:"ಯೋಜನೆ ಸಿದ್ಧವಾಗಿದೆ",ml:"പദ്ധതി തയ്യാറായി",mr:"योजना तयार झाली",bn:"পরিকল্পনা তৈরি হয়েছে"},unit_tonnes_ha:{en:"tonnes/ha",te:"టన్నులు/హెక్టారు",hi:"टन/हेक्टेयर",ta:"டன்/ஹெக்டேர்",kn:"ಟನ್/ಹೆಕ್ಟೇರ್",ml:"ടൺ/ഹെക്ടർ",mr:"टन/हेक्टर",bn:"টন/হেক্টর"}};
+
+Object.keys(langCore).forEach(lang=>{translations[lang]={...translations.en,...langCore[lang],...(opt[lang]||{}),...(placeholders[lang]||{})};});
+Object.keys(extra).forEach(key=>Object.keys(extra[key]).forEach(lang=>{translations[lang][key]=extra[key][lang];}));
+translations.od={...(translations.od||translations.en),calculating:"ଲେଖା ହେଉଛି…",prediction_failed:"ଅନୁମାନ ବିଫଳ ହେଲା",server_error:"ସର୍ଭର ତ୍ରୁଟି",plan_generated:"ଯୋଜନା ପ୍ରସ୍ତୁତ ହେଲା",unit_tonnes_ha:"ଟନ/ହେକ୍ଟର"};
+
+const savedLanguage=localStorage.getItem("rythucrop-language");
+const state={lang:(savedLanguage&&translations[savedLanguage])?savedLanguage:"en"};
+const optionMap={season:["season_kharif","season_rabi","season_summer"],soil:["soil_loamy","soil_black","soil_red","soil_clay","soil_sandy"],irrigation:["water_good","water_moderate","water_low","water_rainfed"],goal:["goal_yield","goal_water","goal_cost","goal_balanced"],experience:["exp_beginner","exp_some","exp_experienced"],adCrop:["crop_rice","crop_wheat","crop_maize","crop_cotton","crop_groundnut","crop_chickpea"],adPriority:["priority_water","priority_fertilizer","priority_pest","goal_yield"]};
+const stableValues={season:["Kharif","Rabi","Summer"],soil:["Loamy","Black Soil","Red Soil","Clay Soil","Sandy Soil"],irrigation:["Good water availability","Moderate water availability","Low water availability","Rainfed"],goal:["Higher yield","Lower water use","Lower input cost","Balanced farming"],experience:["Beginner","Some experience","Experienced"],adCrop:["Rice","Wheat","Maize","Cotton","Groundnut","Chickpea"],adPriority:["Water saving","Fertilizer management","Pest prevention","Higher yield"]};
+const cropKey={Rice:"crop_rice",Wheat:"crop_wheat",Maize:"crop_maize",Cotton:"crop_cotton",Groundnut:"crop_groundnut",Chickpea:"crop_chickpea"};
+function T(){return translations[state.lang]||translations.en;}
+function fmt(s,v={}){return String(s||"").replace(/\{(\w+)\}/g,(_,k)=>v[k]??"");}
+function applyLanguage(lang){
+  state.lang=translations[lang]?lang:"en";
+  const t={...translations.en,...(translations[state.lang]||{})};
+  translations[state.lang]=t;document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.dataset.i18n;if(t[k]!==undefined)el.textContent=t[k];});document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{const k=el.dataset.i18nPlaceholder;if(t[k]!==undefined)el.placeholder=t[k];});Object.keys(optionMap).forEach(id=>{const s=document.getElementById(id);if(!s)return;[...s.options].forEach((o,i)=>{if(stableValues[id][i]!==undefined)o.value=stableValues[id][i];const k=optionMap[id][i];if(k&&t[k])o.textContent=t[k];});});document.documentElement.lang=state.lang;localStorage.setItem("rythucrop-language",state.lang);if(document.getElementById("planResults")?.dataset.generated==="1")generatePlan();if(document.getElementById("adviceTitle")?.dataset.rawCrop)renderAdvice(document.getElementById("adviceTitle").dataset.rawCrop,document.getElementById("adviceTitle").dataset.rawPriority);}
+function pv(v){const m={Kharif:"season_kharif",Rabi:"season_rabi",Summer:"season_summer",Loamy:"soil_loamy","Black Soil":"soil_black","Red Soil":"soil_red","Clay Soil":"soil_clay","Sandy Soil":"soil_sandy","Good water availability":"water_good","Moderate water availability":"water_moderate","Low water availability":"water_low",Rainfed:"water_rainfed","Higher yield":"goal_yield","Lower water use":"goal_water","Lower input cost":"goal_cost","Balanced farming":"goal_balanced",Beginner:"exp_beginner","Some experience":"exp_some",Experienced:"exp_experienced"};return T()[m[v]]||v;}
+function cropLabel(v){return T()[cropKey[v]]||v;}
+function priorityLabel(v){const m={"Water saving":"priority_water","Fertilizer management":"priority_fertilizer","Pest prevention":"priority_pest","Higher yield":"goal_yield"};return T()[m[v]]||v;}
+function generatePlan(){const land=Number(document.getElementById("land").value),season=document.getElementById("season").value,soil=document.getElementById("soil").value,irrigation=document.getElementById("irrigation").value,goal=document.getElementById("goal").value,experience=document.getElementById("experience").value;let crop="Rice";if(irrigation.includes("Low")||irrigation==="Rainfed")crop="Millets / Groundnut";else if(soil==="Black Soil")crop="Cotton / Maize";else if(soil==="Red Soil")crop="Groundnut / Maize";const c=crop.split(" / ").map(x=>cropLabel(x)).join(" / "),t=T();const actions=[`✓ ${t.plan_crop||"Suggested starting crop group: {crop}"}`.replace("{crop}",c),`✓ ${fmt(t.plan_season||"Season selected: {season}.",{season:pv(season)})}`,`✓ ${fmt(t.plan_water||"Water plan: {irrigation}.",{irrigation:pv(irrigation)})}`,`✓ ${fmt(t.plan_goal||"Main goal: {goal}.",{goal:pv(goal)})}`,`✓ ${fmt(t.plan_land||"Land size: {land} acre(s).",{land})}`,`✓ ${fmt(t.plan_experience||"Experience: {experience}.",{experience:pv(experience)})}`];document.getElementById("planTitle").textContent=t.plan_generated||"Plan generated";document.getElementById("planSummary").textContent=t.plan_summary||translations.en.plan_summary;document.getElementById("planResults").innerHTML=actions.map(x=>`<div class="recommendation-item">${x}</div>`).join("");document.getElementById("planResults").dataset.generated="1";}
+
+document.getElementById("language").addEventListener("change",e=>applyLanguage(e.target.value));document.getElementById("language").value=state.lang;applyLanguage(state.lang);
+// Keep the existing theme, navigation and backend endpoints unchanged.
+document.getElementById("themeBtn").addEventListener("click",()=>{document.body.classList.toggle("dark");const d=document.body.classList.contains("dark");document.getElementById("themeBtn").textContent=d?"🌙":"☀️";localStorage.setItem("rythucrop-theme",d?"dark":"light");});if(localStorage.getItem("rythucrop-theme")==="dark"){document.body.classList.add("dark");document.getElementById("themeBtn").textContent="🌙";}
+document.getElementById("menuBtn").addEventListener("click",()=>document.getElementById("mainNav").classList.toggle("open"));
+function syncNavbarHeight(){const n=document.querySelector(".navbar");if(n)document.documentElement.style.setProperty("--actual-navbar-height",n.offsetHeight+"px");}syncNavbarHeight();window.addEventListener("load",syncNavbarHeight);window.addEventListener("resize",syncNavbarHeight);
+
+document.getElementById("planningForm").addEventListener("submit",e=>{e.preventDefault();generatePlan();});
+function normalizeCrop(v){const s=String(v||"").trim();const m={rice:"Rice","వరి":"Rice","చావల్":"Rice","चावल":"Rice","நெல்":"Rice","ಭತ್ತ":"Rice","നെല്ല്":"Rice","तांदूळ":"Rice","ধান":"Rice",wheat:"Wheat","గోధుమ":"Wheat","गेहूं":"Wheat","கோதுமை":"Wheat","ಗೋಧಿ":"Wheat","ഗോതമ്പ്":"Wheat","गहू":"Wheat","গম":"Wheat",maize:"Maize","మొక్కజొన్న":"Maize","मक्का":"Maize","மக்காச்சோளம்":"Maize","ಮೆಕ್ಕೆಜೋಳ":"Maize","ചോളം":"Maize","मका":"Maize","ভুট্টা":"Maize",cotton:"Cotton","పత్తి":"Cotton","कपास":"Cotton","பருத்தி":"Cotton","ಹತ್ತಿ":"Cotton","പരുത്തി":"Cotton","कापूस":"Cotton","তুলা":"Cotton",groundnut:"Groundnut",peanut:"Groundnut","వేరుశెనగ":"Groundnut","मूंगफली":"Groundnut","நிலக்கடலை":"Groundnut","ಕಡಲೆಕಾಯಿ":"Groundnut","നിലക്കടല":"Groundnut","भुईमूग":"Groundnut","চিনাবাদাম":"Groundnut",chickpea:"Chickpea",gram:"Chickpea","శనగ":"Chickpea","चना":"Chickpea","கொண்டைக்கடலை":"Chickpea","ಕಡಲೆ":"Chickpea","കടല":"Chickpea","हरभरा":"Chickpea","ছোলা":"Chickpea"};return m[s.toLowerCase()]||m[s]||s;}
+function normalizeSeasonInput(v){const s=String(v||"").trim();const m={kharif:"Kharif","ఖరీఫ్":"Kharif","खरीफ":"Kharif","காரிஃப்":"Kharif","ಖರೀಫ್":"Kharif","ഖരീഫ്":"Kharif","खरीप":"Kharif","খরিফ":"Kharif",rabi:"Rabi","రబీ":"Rabi","रबी":"Rabi","ரபி":"Rabi","ರಬಿ":"Rabi","റബി":"Rabi","रब्बी":"Rabi","রবি":"Rabi",summer:"Summer","వేసవి":"Summer","गर्मी":"Summer","கோடை":"Summer","ಬೇಸಿಗೆ":"Summer","വേനൽ":"Summer","उन्हाळा":"Summer","গ্রীষ্ম":"Summer"};return m[s.toLowerCase()]||m[s]||s;}
+document.getElementById("cropForm").addEventListener("submit",async e=>{e.preventDefault();const box=document.getElementById("cropResult"),r=document.getElementById("recommendedCrop"),t=T();box.classList.remove("hidden");r.textContent=t.calculating;try{const response=await fetch("/predict",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({N:parseFloat(N.value),P:parseFloat(P.value),K:parseFloat(K.value),temperature:parseFloat(temperature.value),humidity:parseFloat(humidity.value),ph:parseFloat(ph.value),rainfall:parseFloat(rainfall.value)})});const o=await response.json();if(o.recommended_crop){r.dataset.raw=normalizeCrop(o.recommended_crop);r.textContent=cropLabel(r.dataset.raw);}else r.textContent=t.prediction_failed;}catch(x){r.textContent=t.server_error;console.error(x);}});
+document.getElementById("yieldForm").addEventListener("submit",async e=>{e.preventDefault();const box=document.getElementById("yieldResult"),r=document.getElementById("predictedYield"),t=T();const data={Crop:normalizeCrop(document.getElementById("Crop").value),Crop_Year:Number(document.getElementById("Crop_Year").value),Season:normalizeSeasonInput(document.getElementById("Season").value),State:document.getElementById("State").value,Area:Number(document.getElementById("Area").value),Production:Number(document.getElementById("Production").value),Annual_Rainfall:Number(document.getElementById("Annual_Rainfall").value),Fertilizer:Number(document.getElementById("Fertilizer").value),Pesticide:Number(document.getElementById("Pesticide").value)};box.classList.remove("hidden");r.textContent=t.calculating;try{const response=await fetch("/predict-yield",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});const o=await response.json();if(o.predicted_yield!==undefined)r.textContent=Number(o.predicted_yield).toFixed(2)+" "+t.unit_tonnes_ha;else r.textContent=t.prediction_failed;}catch(x){r.textContent=t.server_error;console.error(x);}});
+function renderAdvice(crop,priority){const t=T(),title=document.getElementById("adviceTitle"),list=document.getElementById("adviceList");title.dataset.rawCrop=crop;title.dataset.rawPriority=priority;title.textContent=fmt(t.advice_title_dynamic||"{crop} • {priority}",{crop:cropLabel(crop),priority:priorityLabel(priority)});const m={"Water saving":"Use irrigation according to crop stage and avoid unnecessary watering.","Fertilizer management":"Prefer balanced nutrient application based on soil condition and crop requirement.","Pest prevention":"Inspect leaves and crop rows early; act according to a verified local recommendation.","Higher yield":"Focus on timely sowing, adequate nutrition, irrigation and regular field monitoring."};const advice=m[priority]||priority;list.innerHTML=[advice,`Check crop growth and field conditions regularly for ${cropLabel(crop)}.`,`Use soil-test information before changing fertilizer quantities.`].map(x=>`<div class="recommendation-item">✓ ${x}</div>`).join("");}
+document.getElementById("adviceBtn").addEventListener("click",()=>renderAdvice(document.getElementById("adCrop").value,document.getElementById("adPriority").value));
+/* RythuCrop - Single Section Navigation */
+function showSection(id) {
+    document.querySelectorAll("main > section").forEach(section => {
+        section.classList.remove("active-section");
+    });
+
+    const target = document.getElementById(id);
+
+    if (target) {
+        target.classList.add("active-section");
+
+        // Footer should appear only on About section
+        document.body.classList.toggle("about-active", id === "about");
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }
+}
+
+document.querySelectorAll('#mainNav a[href^="#"]').forEach(link => {
+    link.addEventListener("click", function(e) {
+        e.preventDefault();
+        const id = this.getAttribute("href").substring(1);
+        showSection(id);
+    });
+});
+
+document.querySelectorAll('.hero-buttons a[href^="#"]').forEach(link => {
+    link.addEventListener("click", function(e) {
+        e.preventDefault();
+        const id = this.getAttribute("href").substring(1);
+        showSection(id);
+    });
+});
+
+const initialSection = window.location.hash
+    ? window.location.hash.substring(1)
+    : "home";
+
+showSection(initialSection);
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

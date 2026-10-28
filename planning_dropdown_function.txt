@@ -1,0 +1,17 @@
+﻿<script>
+function translatePlanningDropdowns(){
+    const t=T();
+
+    ["season","soil","irrigation","goal","experience"].forEach(id=>{
+        const select=document.getElementById(id);
+        if(!select) return;
+
+        [...select.options].forEach(option=>{
+            const key=option.dataset.i18nOption;
+            if(key && t[key]){
+                option.textContent=t[key];
+            }
+        });
+    });
+}
+</script>
