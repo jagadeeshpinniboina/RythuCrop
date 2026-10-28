@@ -21,7 +21,7 @@ from app.models.alerts_db import (
     increment_otp_attempts,
     get_or_create_user
 )
-from app.services.sms_service import send_otp_sms, is_sms_configured
+from app.services.sms_service import send_sms_otp, send_otp_sms, is_sms_configured
 
 # Configuration
 OTP_VALIDITY_MINUTES = 5
@@ -109,8 +109,10 @@ def request_otp(mobile_raw: str) -> Tuple[bool, str, Optional[Dict]]:
 
     masked_mobile = get_masked_mobile(mobile)
 
-    # Dispatch OTP via SMS service (Twilio/Fast2SMS/Msg91 or Dev Mock Console)
-    sms_ok, sms_msg = send_otp_sms(mobile, otp, masked_mobile)
+    # Dispatch OTP via Fast2SMS Live Gateway (or dev console fallback)
+    sms_ok, sms_msg = send_sms_otp(mobile, otp)
+    if not sms_ok:
+        return False, sms_msg, None
 
     is_dev = not is_sms_configured() or os.environ.get("RYTHUCROP_DEV_AUTH", "true").lower() == "true"
 

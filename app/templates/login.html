@@ -371,41 +371,6 @@
             border: 1px solid #86efac;
         }
 
-        /* Dev Mock Mode Banner */
-        .dev-mock-toast {
-            background: #fffbeb;
-            border: 1px dashed var(--amber);
-            border-radius: 12px;
-            padding: 12px 14px;
-            margin-bottom: 1.25rem;
-            font-size: 0.85rem;
-            color: #92400e;
-            text-align: left;
-            display: none;
-        }
-
-        .dev-mock-toast strong {
-            color: #78350f;
-        }
-
-        .btn-quickfill {
-            margin-top: 8px;
-            display: inline-block;
-            background: var(--amber);
-            color: #ffffff;
-            border: none;
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-quickfill:hover {
-            background: var(--amber-dark);
-        }
-
         /* Loading Spinner */
         .spinner {
             display: inline-block;
@@ -522,13 +487,6 @@
                 <span>📱</span>
                 <span id="txtMaskedNotice">Enter the 6-digit OTP sent to <strong id="displayMaskedPhone">XXXXXX8801</strong></span>
                 <button type="button" class="edit-number-btn" onclick="backToStepMobile()" title="Change mobile number">Change</button>
-            </div>
-
-            <!-- Development Mock Mode Toast Banner -->
-            <div id="devMockBanner" class="dev-mock-toast">
-                <div>⚙️ <strong>Development Mock Mode Active</strong></div>
-                <div id="devMockDetails" style="margin-top: 4px;">Console logged test OTP: <strong id="devOtpCode">123456</strong></div>
-                <button type="button" class="btn-quickfill" onclick="quickFillDevOTP()">⚡ Quick Fill Test OTP</button>
             </div>
 
             <div id="otpError" class="alert-box alert-danger"></div>
@@ -730,7 +688,6 @@
         let activeMobile = "";
         let countdownTimer = null;
         let countdownSeconds = 30;
-        let lastDevOtp = "";
 
         const nextParam = new URLSearchParams(window.location.search).get("next") || "/home";
 
@@ -816,16 +773,6 @@
                 const t = I18N[currentLang] || I18N.en;
                 document.getElementById("txtMaskedNotice").innerHTML = `${t.sentTo} <strong id="displayMaskedPhone">${masked}</strong>`;
 
-                // Dev Mock Mode Handling
-                const devBanner = document.getElementById("devMockBanner");
-                if (data.dev_mode && data.dev_otp) {
-                    lastDevOtp = data.dev_otp;
-                    document.getElementById("devOtpCode").textContent = data.dev_otp;
-                    devBanner.style.display = "block";
-                } else {
-                    devBanner.style.display = "none";
-                }
-
                 // Start 30-Second Countdown Timer
                 startCountdown(data.cooldown_seconds || 30);
 
@@ -835,7 +782,7 @@
                 if (firstBox) firstBox.focus();
 
             } catch (err) {
-                errBox.textContent = err.message;
+                errBox.textContent = err.message || "Unable to send SMS. Please check your network or try again.";
                 errBox.style.display = "block";
             } finally {
                 btn.disabled = false;
@@ -899,12 +846,6 @@
                 succBox.textContent = "New 6-digit OTP has been sent successfully.";
                 succBox.style.display = "block";
 
-                if (data.dev_mode && data.dev_otp) {
-                    lastDevOtp = data.dev_otp;
-                    document.getElementById("devOtpCode").textContent = data.dev_otp;
-                    document.getElementById("devMockBanner").style.display = "block";
-                }
-
                 // Restart 30s countdown
                 startCountdown(data.cooldown_seconds || 30);
 
@@ -917,22 +858,10 @@
                 if (firstBox) firstBox.focus();
 
             } catch (err) {
-                errBox.textContent = err.message;
+                errBox.textContent = err.message || "Unable to send SMS. Please check your network or try again.";
                 errBox.style.display = "block";
                 resendBtn.disabled = false;
             }
-        }
-
-        function quickFillDevOTP() {
-            if (!lastDevOtp || lastDevOtp.length !== 6) return;
-            const boxes = document.querySelectorAll(".otp-box");
-            for (let i = 0; i < 6; i++) {
-                if (boxes[i]) {
-                    boxes[i].value = lastDevOtp[i];
-                    boxes[i].classList.add("filled");
-                }
-            }
-            document.getElementById("btnVerifyOTP").focus();
         }
 
         function setupOtpInputHandlers() {

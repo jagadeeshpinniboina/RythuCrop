@@ -5,4 +5,6 @@ Crop-Yield-Prediction-Backup/
 app_backup/
 .system_generated/
 *.db
+.env
+.env.local
 

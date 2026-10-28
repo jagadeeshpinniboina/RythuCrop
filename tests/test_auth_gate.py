@@ -271,6 +271,39 @@ class TestAuthGate(unittest.TestCase):
         self.assertEqual(subsequent_resp.status_code, 302)
         self.assertIn("/login", subsequent_resp.headers.get("Location", ""))
 
+    # =========================================================================
+    # 6. FAST2SMS HELPER & FAILURE HANDLING
+    # =========================================================================
+
+    def test_14_send_sms_otp_helper_function(self):
+        """Self-contained send_sms_otp helper validates input and dispatches properly."""
+        from app.services.sms_service import send_sms_otp
+
+        # Invalid mobile
+        ok, msg = send_sms_otp("12345", "123456")
+        self.assertFalse(ok)
+        self.assertIn("Invalid", msg)
+
+        # Valid mobile with dev fallback
+        ok, msg = send_sms_otp("9876543210", "123456")
+        self.assertTrue(ok)
+        self.assertIn("XXXXXX3210", msg)
+
+    def test_15_sms_gateway_failure_returns_inline_toast_error(self):
+        """When Fast2SMS dispatch fails or throws exception, return clean 400 error."""
+        from unittest.mock import patch
+
+        with patch("app.services.sms_service.is_sms_configured", return_value=True):
+            with patch("requests.post", side_effect=Exception("Connection timed out")):
+                resp = self.client.post("/auth/send-otp", json={"mobile": "9876540011"})
+                self.assertEqual(resp.status_code, 400)
+                data = resp.get_json()
+                self.assertFalse(data["success"])
+                self.assertEqual(
+                    data["error"],
+                    "Unable to send SMS. Please check your network or try again."
+                )
+
 
 if __name__ == "__main__":
     unittest.main()
