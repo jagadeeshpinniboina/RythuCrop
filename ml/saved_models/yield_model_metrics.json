@@ -1,0 +1,93 @@
+{
+  "dataset_records": 19689,
+  "training_records": 15751,
+  "test_records": 3938,
+  "features": [
+    "Crop",
+    "Season",
+    "State",
+    "Crop_Year",
+    "Area",
+    "Annual_Rainfall",
+    "Fertilizer",
+    "Pesticide"
+  ],
+  "overall_mae": 13.3282,
+  "overall_rmse": 275.6861,
+  "overall_r2": 0.9051,
+  "target_leakage_free": true,
+  "crop_specific_metrics": {
+    "Rice": {
+      "sample_count": 236,
+      "mean_actual": 2.1931017667584745,
+      "mae": 0.2651,
+      "rmse": 0.6099,
+      "r2": 0.5721,
+      "unit": "tonnes/ha"
+    },
+    "Wheat": {
+      "sample_count": 103,
+      "mean_actual": 2.2033869423883496,
+      "mae": 0.3205,
+      "rmse": 0.4849,
+      "r2": 0.8573,
+      "unit": "tonnes/ha"
+    },
+    "Maize": {
+      "sample_count": 197,
+      "mean_actual": 2.437818824563452,
+      "mae": 0.6157,
+      "rmse": 1.8811,
+      "r2": 0.3317,
+      "unit": "tonnes/ha"
+    },
+    "Sugarcane": {
+      "sample_count": 112,
+      "mean_actual": 54.15663812413392,
+      "mae": 7.533,
+      "rmse": 11.1985,
+      "r2": 0.8547,
+      "unit": "tonnes/ha"
+    },
+    "Cotton(lint)": {
+      "sample_count": 98,
+      "mean_actual": 1.8276125346530612,
+      "mae": 0.5638,
+      "rmse": 0.8995,
+      "r2": 0.4,
+      "unit": "tonnes/ha"
+    },
+    "Groundnut": {
+      "sample_count": 147,
+      "mean_actual": 1.3455643146190475,
+      "mae": 0.2375,
+      "rmse": 0.3333,
+      "r2": 0.6589,
+      "unit": "tonnes/ha"
+    },
+    "Gram": {
+      "sample_count": 103,
+      "mean_actual": 0.9414042041262134,
+      "mae": 0.3764,
+      "rmse": 0.9387,
+      "r2": -0.0691,
+      "unit": "tonnes/ha"
+    },
+    "Potato": {
+      "sample_count": 109,
+      "mean_actual": 11.044242135807341,
+      "mae": 1.7718,
+      "rmse": 2.7276,
+      "r2": 0.7596,
+      "unit": "tonnes/ha"
+    },
+    "Onion": {
+      "sample_count": 93,
+      "mean_actual": 11.97987446072043,
+      "mae": 2.3878,
+      "rmse": 5.2568,
+      "r2": 0.7056,
+      "unit": "tonnes/ha"
+    }
+  }
+}

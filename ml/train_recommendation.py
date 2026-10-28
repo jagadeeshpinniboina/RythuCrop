@@ -11,7 +11,7 @@ FEATURE_COLUMNS = [
     "temperature", "humidity", "ph", "rainfall"
 ]
 
-DATASET_PATH = Path(r"C:\Users\pinni\Downloads\archive (2)\merged_crop_dataset.csv")
+DATASET_PATH = Path(__file__).resolve().parent / "data" / "merged_crop_dataset.csv"
 
 
 def load_dataset():

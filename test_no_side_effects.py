@@ -36,7 +36,7 @@ try:
     resp = requests.post(f"{BASE_URL}/predict-yield", json=yield_data)
     if resp.status_code == 200:
         result = resp.json()
-        if "yield" in result or "prediction" in result.lower():
+        if "yield" in result or "predicted_yield" in result:
             print(f"   ✓ Yield prediction works → {result}")
         else:
             print(f"   ✗ Unexpected response: {result}")
