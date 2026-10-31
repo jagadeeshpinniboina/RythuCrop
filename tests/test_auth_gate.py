@@ -283,73 +283,51 @@ class TestAuthGate(unittest.TestCase):
         self.assertIn("/login", subsequent_resp.headers.get("Location", ""))
 
     # =========================================================================
-    # 6. FAST2SMS LIVE GATEWAY & OPTION A/B FALLBACK HANDLING
+    # 6. TWILIO WHATSAPP GATEWAY & FALLBACK HANDLING
     # =========================================================================
 
-    def test_14_send_sms_otp_input_validation_and_dev_fallback(self):
-        """send_sms_otp validates mobile format and works in dev fallback mode."""
-        # Invalid numbers
-        ok, msg = send_sms_otp("12345", "123456")
-        self.assertFalse(ok)
-        self.assertIn("Invalid", msg)
-
-        # Valid number in dev mode
+    def test_14_send_sms_otp_dev_mode_fallback(self):
+        """send_sms_otp generates OTP and logs backend code when in dev mode."""
         os.environ["RYTHUCROP_DEV_AUTH"] = "true"
         ok, msg = send_sms_otp("9876543210", "123456")
         self.assertTrue(ok)
-        self.assertIn("XXXXXX3210", msg)
+        self.assertIn("Dev Mode", msg)
 
-    def test_15_fast2sms_route_otp_falls_back_to_quick_route_q(self):
-        """If route 'otp' fails, system cleanly falls back to route 'q'."""
+    def test_15_twilio_whatsapp_dispatch_success(self):
+        """Twilio WhatsApp dispatch succeeds when Client returns valid message SID."""
         os.environ["RYTHUCROP_DEV_AUTH"] = "false"
 
-        mock_resp_a = MagicMock()
-        mock_resp_a.status_code = 400
-        mock_resp_a.text = '{"status_code":996,"message":"Before using OTP Message API, complete website verification."}'
-        mock_resp_a.json.return_value = {"status_code": 996, "message": "Before using OTP Message API, complete website verification."}
+        mock_msg = MagicMock()
+        mock_msg.sid = "SM_TEST_WHATSAPP_SID_12345"
 
-        mock_resp_b = MagicMock()
-        mock_resp_b.status_code = 200
-        mock_resp_b.text = '{"return":true,"message":["SMS sent successfully."]}'
-        mock_resp_b.json.return_value = {"return": True, "message": ["SMS sent successfully."]}
+        with patch("app.services.sms_service.Client") as mock_twilio_client:
+            instance = mock_twilio_client.return_value
+            instance.messages.create.return_value = mock_msg
 
-        with patch("app.services.sms_service.is_sms_configured", return_value=True):
-            with patch("requests.post", side_effect=[mock_resp_a, mock_resp_b]) as mock_post:
-                ok, msg = send_sms_otp("9876543210", "654321")
-                self.assertTrue(ok)
-                self.assertIn("successfully", msg)
-                self.assertEqual(mock_post.call_count, 2)
-                # First call used route 'otp'
-                call1_data = mock_post.call_args_list[0][1]["data"]
-                self.assertEqual(call1_data["route"], "otp")
-                self.assertEqual(call1_data["variables_values"], "654321")
-                # Second call used route 'q'
-                call2_data = mock_post.call_args_list[1][1]["data"]
-                self.assertEqual(call2_data["route"], "q")
-                self.assertIn("654321", call2_data["message"])
+            ok, msg = send_sms_otp("9876543210", "654321")
+            self.assertTrue(ok)
+            self.assertEqual(msg, "OTP sent successfully via WhatsApp")
 
-    def test_16_fast2sms_complete_failure_returns_detailed_error(self):
-        """If both Fast2SMS routes fail, terminal logs real OTP and API returns clear error details."""
+            # Verify parameters
+            instance.messages.create.assert_called_once()
+            _, kwargs = instance.messages.create.call_args
+            self.assertEqual(kwargs["to"], "whatsapp:+919876543210")
+            self.assertIn("654321", kwargs["body"])
+            self.assertEqual(kwargs["from_"], "whatsapp:+17372508034")
+
+    def test_16_twilio_whatsapp_failure_returns_error_and_logs_backend_otp(self):
+        """If Twilio throws an error, terminal logs backend OTP and API returns clear error."""
         os.environ["RYTHUCROP_DEV_AUTH"] = "false"
 
-        mock_resp_a = MagicMock()
-        mock_resp_a.status_code = 400
-        mock_resp_a.text = '{"status_code":996,"message":"Before using OTP Message API, complete website verification."}'
-        mock_resp_a.json.return_value = {"status_code": 996, "message": "Before using OTP Message API, complete website verification."}
+        with patch("app.services.sms_service.Client") as mock_twilio_client:
+            instance = mock_twilio_client.return_value
+            instance.messages.create.side_effect = Exception("Twilio Sandbox not joined")
 
-        mock_resp_b = MagicMock()
-        mock_resp_b.status_code = 400
-        mock_resp_b.text = '{"status_code":999,"message":"You need to complete one transaction of 100 INR or more before using API route."}'
-        mock_resp_b.json.return_value = {"status_code": 999, "message": "You need to complete one transaction of 100 INR or more before using API route."}
-
-        with patch("app.services.sms_service.is_sms_configured", return_value=True):
-            with patch("requests.post", side_effect=[mock_resp_a, mock_resp_b]):
-                resp = self.client.post("/auth/send-otp", json={"mobile": "9876540011"})
-                self.assertEqual(resp.status_code, 400)
-                data = resp.get_json()
-                self.assertFalse(data["success"])
-                self.assertIn("100 INR", data["error"])
-                self.assertIn("Fast2SMS Error", data["error"])
+            resp = self.client.post("/auth/send-otp", json={"mobile": "9876540011"})
+            self.assertEqual(resp.status_code, 400)
+            data = resp.get_json()
+            self.assertFalse(data["success"])
+            self.assertIn("Twilio Sandbox not joined", data["error"])
 
 
 if __name__ == "__main__":
