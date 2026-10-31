@@ -1,6 +1,8 @@
 import sys
+import os
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+os.environ["RYTHUCROP_DEV_AUTH"] = "true"
 
 from app import app
 from app.models.predictor import recommend_farm_plan, recommend_crop_top3, CropInputError

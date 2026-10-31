@@ -3,6 +3,7 @@ RythuCrop Comprehensive Master Test Suite
 Validates all 19 requirements of the Master Specification.
 """
 
+import os
 import sys
 import unittest
 from pathlib import Path
@@ -56,10 +57,18 @@ class TestRythuCropMaster(unittest.TestCase):
 
     def setUp(self):
         self.client = app.test_client()
+        self._orig_dev_auth = os.environ.get("RYTHUCROP_DEV_AUTH")
+        os.environ["RYTHUCROP_DEV_AUTH"] = "true"
         with self.client.session_transaction() as sess:
             sess["is_authenticated"] = True
             sess["mobile"] = "+919876543210"
             sess["user_id"] = "+919876543210"
+
+    def tearDown(self):
+        if self._orig_dev_auth is not None:
+            os.environ["RYTHUCROP_DEV_AUTH"] = self._orig_dev_auth
+        else:
+            os.environ.pop("RYTHUCROP_DEV_AUTH", None)
 
     # 1. Startup & Web Routes
     def test_01_app_startup_and_home(self):

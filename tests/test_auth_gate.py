@@ -1,13 +1,16 @@
 """
 RythuCrop Authentication Gate Test Suite
 Validates the complete Mobile + 6-digit OTP Authentication Gate,
-pre-login wall, route protection, cooldowns, attempts limits, and session lifecycle.
+pre-login wall, route protection, cooldowns, attempts limits, session lifecycle,
+and Fast2SMS OTP route / Quick route fallback and failure handling.
 """
 
+import os
 import sys
 import unittest
 from pathlib import Path
 import datetime
+from unittest.mock import patch, MagicMock
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
@@ -27,6 +30,7 @@ from app.models.alerts_db import (
     get_latest_otp_request,
     increment_otp_attempts
 )
+from app.services.sms_service import send_sms_otp
 
 
 class TestAuthGate(unittest.TestCase):
@@ -35,6 +39,15 @@ class TestAuthGate(unittest.TestCase):
         self.client = app.test_client()
         # Reset in-memory cooldown tracker before each test
         _LAST_REQUEST_TIME.clear()
+        self._orig_dev_auth = os.environ.get("RYTHUCROP_DEV_AUTH")
+        # Default test environment to dev auth mode for gate / session tests
+        os.environ["RYTHUCROP_DEV_AUTH"] = "true"
+
+    def tearDown(self):
+        if self._orig_dev_auth is not None:
+            os.environ["RYTHUCROP_DEV_AUTH"] = self._orig_dev_auth
+        else:
+            os.environ.pop("RYTHUCROP_DEV_AUTH", None)
 
     # =========================================================================
     # 1. PRE-LOGIN WALL & GATEWAY TESTS
@@ -151,10 +164,8 @@ class TestAuthGate(unittest.TestCase):
         self.assertEqual(data["masked_mobile"], "XXXXXX3210")
         self.assertEqual(data["cooldown_seconds"], 30)
         self.assertEqual(data["expires_in_seconds"], 300)
-        # Check dev mock mode payload
-        if data.get("dev_mode"):
-            self.assertIsNotNone(data.get("dev_otp"))
-            self.assertEqual(len(data["dev_otp"]), 6)
+        self.assertIsNotNone(data.get("dev_otp"))
+        self.assertEqual(len(data["dev_otp"]), 6)
 
     def test_09_resend_cooldown_enforced(self):
         """Submitting OTP request twice within 30 seconds must be rejected with 400."""
@@ -272,37 +283,73 @@ class TestAuthGate(unittest.TestCase):
         self.assertIn("/login", subsequent_resp.headers.get("Location", ""))
 
     # =========================================================================
-    # 6. FAST2SMS HELPER & FAILURE HANDLING
+    # 6. FAST2SMS LIVE GATEWAY & OPTION A/B FALLBACK HANDLING
     # =========================================================================
 
-    def test_14_send_sms_otp_helper_function(self):
-        """Self-contained send_sms_otp helper validates input and dispatches properly."""
-        from app.services.sms_service import send_sms_otp
-
-        # Invalid mobile
+    def test_14_send_sms_otp_input_validation_and_dev_fallback(self):
+        """send_sms_otp validates mobile format and works in dev fallback mode."""
+        # Invalid numbers
         ok, msg = send_sms_otp("12345", "123456")
         self.assertFalse(ok)
         self.assertIn("Invalid", msg)
 
-        # Valid mobile with dev fallback
+        # Valid number in dev mode
+        os.environ["RYTHUCROP_DEV_AUTH"] = "true"
         ok, msg = send_sms_otp("9876543210", "123456")
         self.assertTrue(ok)
         self.assertIn("XXXXXX3210", msg)
 
-    def test_15_sms_gateway_failure_returns_inline_toast_error(self):
-        """When Fast2SMS dispatch fails or throws exception, return clean 400 error."""
-        from unittest.mock import patch
+    def test_15_fast2sms_route_otp_falls_back_to_quick_route_q(self):
+        """If route 'otp' fails, system cleanly falls back to route 'q'."""
+        os.environ["RYTHUCROP_DEV_AUTH"] = "false"
+
+        mock_resp_a = MagicMock()
+        mock_resp_a.status_code = 400
+        mock_resp_a.text = '{"status_code":996,"message":"Before using OTP Message API, complete website verification."}'
+        mock_resp_a.json.return_value = {"status_code": 996, "message": "Before using OTP Message API, complete website verification."}
+
+        mock_resp_b = MagicMock()
+        mock_resp_b.status_code = 200
+        mock_resp_b.text = '{"return":true,"message":["SMS sent successfully."]}'
+        mock_resp_b.json.return_value = {"return": True, "message": ["SMS sent successfully."]}
 
         with patch("app.services.sms_service.is_sms_configured", return_value=True):
-            with patch("requests.post", side_effect=Exception("Connection timed out")):
+            with patch("requests.post", side_effect=[mock_resp_a, mock_resp_b]) as mock_post:
+                ok, msg = send_sms_otp("9876543210", "654321")
+                self.assertTrue(ok)
+                self.assertIn("successfully", msg)
+                self.assertEqual(mock_post.call_count, 2)
+                # First call used route 'otp'
+                call1_data = mock_post.call_args_list[0][1]["data"]
+                self.assertEqual(call1_data["route"], "otp")
+                self.assertEqual(call1_data["variables_values"], "654321")
+                # Second call used route 'q'
+                call2_data = mock_post.call_args_list[1][1]["data"]
+                self.assertEqual(call2_data["route"], "q")
+                self.assertIn("654321", call2_data["message"])
+
+    def test_16_fast2sms_complete_failure_returns_detailed_error(self):
+        """If both Fast2SMS routes fail, terminal logs real OTP and API returns clear error details."""
+        os.environ["RYTHUCROP_DEV_AUTH"] = "false"
+
+        mock_resp_a = MagicMock()
+        mock_resp_a.status_code = 400
+        mock_resp_a.text = '{"status_code":996,"message":"Before using OTP Message API, complete website verification."}'
+        mock_resp_a.json.return_value = {"status_code": 996, "message": "Before using OTP Message API, complete website verification."}
+
+        mock_resp_b = MagicMock()
+        mock_resp_b.status_code = 400
+        mock_resp_b.text = '{"status_code":999,"message":"You need to complete one transaction of 100 INR or more before using API route."}'
+        mock_resp_b.json.return_value = {"status_code": 999, "message": "You need to complete one transaction of 100 INR or more before using API route."}
+
+        with patch("app.services.sms_service.is_sms_configured", return_value=True):
+            with patch("requests.post", side_effect=[mock_resp_a, mock_resp_b]):
                 resp = self.client.post("/auth/send-otp", json={"mobile": "9876540011"})
                 self.assertEqual(resp.status_code, 400)
                 data = resp.get_json()
                 self.assertFalse(data["success"])
-                self.assertEqual(
-                    data["error"],
-                    "Unable to send SMS. Please check your network or try again."
-                )
+                self.assertIn("100 INR", data["error"])
+                self.assertIn("Fast2SMS Error", data["error"])
 
 
 if __name__ == "__main__":

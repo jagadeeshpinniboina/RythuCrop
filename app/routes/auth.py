@@ -42,7 +42,7 @@ def send_otp():
     stores salted SHA-256 hash, and sends OTP via SMS or dev mock mode.
     """
     data = request.get_json() or {}
-    mobile_input = data.get("mobile", "").strip()
+    mobile_input = str(data.get("mobile") or "").strip()
 
     if not mobile_input:
         return jsonify({
@@ -55,6 +55,7 @@ def send_otp():
         return jsonify({
             "success": False,
             "error": msg,
+            "details": msg,
             "cooldown_remaining": (extra or {}).get("cooldown_remaining", 0)
         }), 400
 
@@ -81,8 +82,8 @@ def verify_otp_endpoint():
     Initializes Flask session upon success.
     """
     data = request.get_json() or {}
-    mobile_input = data.get("mobile", "").strip()
-    otp_input = data.get("otp", "").strip()
+    mobile_input = str(data.get("mobile") or "").strip()
+    otp_input = str(data.get("otp") or "").strip()
     lang = data.get("preferred_lang", session.get("preferred_lang", "en"))
     next_url = data.get("next", "")
 
