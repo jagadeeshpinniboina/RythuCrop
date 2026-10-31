@@ -773,6 +773,13 @@
                 const t = I18N[currentLang] || I18N.en;
                 document.getElementById("txtMaskedNotice").innerHTML = `${t.sentTo} <strong id="displayMaskedPhone">${masked}</strong>`;
 
+                // Display dispatch notice/status
+                const succBox = document.getElementById("otpSuccess");
+                if (succBox && data.message) {
+                    succBox.textContent = data.message;
+                    succBox.style.display = "block";
+                }
+
                 // Start 30-Second Countdown Timer
                 startCountdown(data.cooldown_seconds || 30);
 
@@ -843,7 +850,7 @@
                     throw new Error(data.error || "Unable to resend OTP.");
                 }
 
-                succBox.textContent = "New 6-digit OTP has been sent successfully.";
+                succBox.textContent = data.message || "New 6-digit OTP has been sent successfully.";
                 succBox.style.display = "block";
 
                 // Restart 30s countdown

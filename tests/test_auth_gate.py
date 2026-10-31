@@ -291,10 +291,10 @@ class TestAuthGate(unittest.TestCase):
         os.environ["RYTHUCROP_DEV_AUTH"] = "true"
         ok, msg = send_sms_otp("9876543210", "123456")
         self.assertTrue(ok)
-        self.assertIn("Dev Mode", msg)
+        self.assertIn("OTP dispatched", msg)
 
-    def test_15_twilio_whatsapp_dispatch_success(self):
-        """Twilio WhatsApp dispatch succeeds when Client returns valid message SID."""
+    def test_15_twilio_whatsapp_template_dispatch_success(self):
+        """Twilio WhatsApp dispatch succeeds with ContentSid verification template."""
         os.environ["RYTHUCROP_DEV_AUTH"] = "false"
 
         mock_msg = MagicMock()
@@ -312,22 +312,49 @@ class TestAuthGate(unittest.TestCase):
             instance.messages.create.assert_called_once()
             _, kwargs = instance.messages.create.call_args
             self.assertEqual(kwargs["to"], "whatsapp:+919876543210")
-            self.assertIn("654321", kwargs["body"])
+            self.assertEqual(kwargs["content_sid"], "HXb5b62575e6e4ff6129ad7c8efe1f983e")
+            self.assertEqual(kwargs["content_variables"], '{"1":"654321"}')
             self.assertEqual(kwargs["from_"], "whatsapp:+17372508034")
 
-    def test_16_twilio_whatsapp_failure_returns_error_and_logs_backend_otp(self):
-        """If Twilio throws an error, terminal logs backend OTP and API returns clear error."""
+    def test_16_twilio_whatsapp_template_fails_falls_back_to_plain_body(self):
+        """If template dispatch fails, it attempts plain body fallback."""
+        os.environ["RYTHUCROP_DEV_AUTH"] = "false"
+
+        mock_msg = MagicMock()
+        mock_msg.sid = "SM_BODY_FALLBACK_12345"
+
+        with patch("app.services.sms_service.Client") as mock_twilio_client:
+            instance = mock_twilio_client.return_value
+            # First call (template) fails, second call (body) succeeds
+            instance.messages.create.side_effect = [
+                Exception("Template not found"),
+                mock_msg
+            ]
+
+            ok, msg = send_sms_otp("9876543210", "654321")
+            self.assertTrue(ok)
+            self.assertEqual(msg, "OTP sent via WhatsApp")
+            self.assertEqual(instance.messages.create.call_count, 2)
+            _, second_call_kwargs = instance.messages.create.call_args_list[1]
+            self.assertIn("654321", second_call_kwargs["body"])
+
+    def test_17_twilio_whatsapp_error_21654_auto_fallback_never_breaks_login(self):
+        """If Twilio returns Error 21654 / gateway error, auto-fallback logs OTP and lets user advance."""
         os.environ["RYTHUCROP_DEV_AUTH"] = "false"
 
         with patch("app.services.sms_service.Client") as mock_twilio_client:
             instance = mock_twilio_client.return_value
-            instance.messages.create.side_effect = Exception("Twilio Sandbox not joined")
+            # Both template and body fail with Error 21654
+            instance.messages.create.side_effect = [
+                Exception("\x1b[31mError 21654: ContentSid Required\x1b[0m"),
+                Exception("\x1b[31mError 21654: ContentSid Required\x1b[0m")
+            ]
 
             resp = self.client.post("/auth/send-otp", json={"mobile": "9876540011"})
-            self.assertEqual(resp.status_code, 400)
+            self.assertEqual(resp.status_code, 200)
             data = resp.get_json()
-            self.assertFalse(data["success"])
-            self.assertIn("Twilio Sandbox not joined", data["error"])
+            self.assertTrue(data["success"])
+            self.assertIn("OTP dispatched", data["message"])
 
 
 if __name__ == "__main__":
