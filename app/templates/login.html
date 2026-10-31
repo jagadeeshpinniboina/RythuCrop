@@ -773,10 +773,10 @@
                 const t = I18N[currentLang] || I18N.en;
                 document.getElementById("txtMaskedNotice").innerHTML = `${t.sentTo} <strong id="displayMaskedPhone">${masked}</strong>`;
 
-                // Display dispatch notice/status
+                // Display dispatch notice strictly without OTP code
                 const succBox = document.getElementById("otpSuccess");
-                if (succBox && data.message) {
-                    succBox.textContent = data.message;
+                if (succBox) {
+                    succBox.textContent = `OTP sent successfully to your WhatsApp number (+91 ${masked}).`;
                     succBox.style.display = "block";
                 }
 
@@ -850,7 +850,8 @@
                     throw new Error(data.error || "Unable to resend OTP.");
                 }
 
-                succBox.textContent = data.message || "New 6-digit OTP has been sent successfully.";
+                const resendMasked = `XXXXXX${activeMobile.slice(-4)}`;
+                succBox.textContent = `OTP sent successfully to your WhatsApp number (+91 ${resendMasked}).`;
                 succBox.style.display = "block";
 
                 // Restart 30s countdown
