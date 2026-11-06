@@ -235,6 +235,7 @@ def api_auth_session():
             "authenticated": True,
             "user": {
                 "id": session["user_id"],
+                "email": session.get("email"),
                 "mobile": session.get("mobile"),
                 "preferred_lang": session.get("preferred_lang", "en")
             }

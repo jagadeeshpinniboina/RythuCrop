@@ -17,3 +17,4 @@ app.register_blueprint(auth_bp)
 from app.routes import main
 from app.routes import prediction
 from app.routes import api
+from app.routes import advisory

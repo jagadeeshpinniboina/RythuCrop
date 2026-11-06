@@ -4,6 +4,11 @@ from app.services.auth_service import login_required
 
 
 @app.route("/")
+def public_landing():
+    """Public Landing Page - loads first for all visitors without gating."""
+    return render_template("index.html")
+
+
 @app.route("/home")
 @login_required
 def home():
@@ -37,13 +42,6 @@ def yield_prediction():
 def smart_advisory():
     """Protected Smart Advisory shortcut."""
     return redirect(url_for("main.home") + "#advisory")
-
-
-@app.route("/market-prices")
-@login_required
-def market_prices():
-    """Protected Market Prices shortcut."""
-    return redirect(url_for("main.home") + "#market")
 
 
 @app.route("/about")

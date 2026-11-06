@@ -16,6 +16,32 @@ body {
     line-height: 1.6;
 }
 
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.responsive-nav-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 900px) {
+  .navbar-links-group {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    gap: 0.5rem;
+  }
+  .navbar-links-group a {
+    text-align: center;
+    padding: 0.5rem;
+  }
+}
+
 
 /* =========================================================
    NAVBAR
@@ -26,7 +52,8 @@ body {
     top: 0;
     z-index: 1000;
 
-    height: 72px;
+    min-height: 72px;
+    height: auto;
     background: rgba(255, 255, 255, 0.96);
     border-bottom: 1px solid #e5e7eb;
 
@@ -36,7 +63,8 @@ body {
 .nav-container {
     width: 90%;
     max-width: 1180px;
-    height: 100%;
+    min-height: 72px;
+    height: auto;
     margin: auto;
 
     display: flex;
@@ -1507,4 +1535,264 @@ footer {
         font-size: 15px !important;
         line-height: 1.5 !important;
     }
+}
+
+
+/* =========================================================
+   RYTHUCROP AI-AGRI CIRCULAR EMBLEM & BRAND STYLES
+   ========================================================= */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.brand-badge-circle {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px;
+    border-radius: 50%;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(6, 78, 59, 0.28);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+.brand-badge-circle img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain;
+    display: block;
+}
+.brand-badge-circle:hover {
+    transform: scale(1.08);
+}
+.brand-text {
+    font-size: 1.45rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em;
+    color: #0f172a;
+}
+.brand-accent {
+    color: #16a34a !important;
+}
+.brand-emblem-hero {
+    width: 68px !important;
+    height: 68px !important;
+    min-width: 68px;
+    border-radius: 50%;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    box-shadow: 0 4px 20px rgba(6, 78, 59, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    transition: transform 0.25s ease;
+}
+.brand-emblem-hero:hover {
+    transform: scale(1.08);
+}
+.brand-emblem-hero img {
+    width: 68px !important;
+    height: 68px !important;
+    object-fit: contain;
+    display: block;
+}
+.brand-emblem-card {
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px;
+    border-radius: 50%;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    box-shadow: 0 4px 14px rgba(6, 78, 59, 0.28);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem auto;
+    transition: transform 0.2s ease;
+}
+.brand-emblem-card:hover {
+    transform: scale(1.08);
+}
+.brand-emblem-card img {
+    width: 52px !important;
+    height: 52px !important;
+    object-fit: contain;
+    display: block;
+}
+
+
+/* Auth Portal Lockup & Card Header */
+.auth-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    z-index: 2;
+    margin-bottom: 38px;
+}
+
+.auth-brand .brand-text {
+    font-size: 2.25rem !important;
+    font-weight: 850 !important;
+    color: #ffffff;
+    letter-spacing: -0.03em;
+    display: inline-flex;
+    align-items: center;
+}
+
+.auth-brand .brand-badge-circle {
+    width: 56px !important;
+    height: 56px !important;
+    min-width: 56px !important;
+}
+
+.auth-card-top-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.auth-card-top-brand .brand-badge-circle {
+    width: 54px !important;
+    height: 54px !important;
+    min-width: 54px !important;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.22) !important;
+}
+
+.auth-card-top-brand span {
+    font-size: 1.95rem !important;
+    font-weight: 850 !important;
+    letter-spacing: -0.02em !important;
+    color: #0f172a !important;
+    display: inline-flex;
+    align-items: center;
+}
+
+.auth-card-header h2 {
+    font-size: 1.7rem !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    margin: 6px 0 8px !important;
+    line-height: 1.25 !important;
+}
+
+.auth-card-header p {
+    font-size: 0.95rem !important;
+    color: #64748b !important;
+    margin: 0 0 24px !important;
+}
+
+.auth-card-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.card-logo-badge {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1.5px solid rgba(16, 185, 129, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-logo-badge:hover {
+    transform: scale(1.06);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25);
+}
+
+.card-logo-badge img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    display: block;
+}
+
+/* Input Text Contrast & Visibility & Autofill Fix */
+.form-control, 
+input[type="text"], 
+input[type="email"], 
+select,
+.email-input, 
+.standard-input,
+.region-select {
+    color: #0f172a !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    background-color: #ffffff !important;
+}
+
+/* Fix faint browser autofill overlay */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+    -webkit-text-fill-color: #0f172a !important;
+    -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* High-contrast readable placeholders */
+::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+    font-weight: 400 !important;
+}
+
+::-webkit-input-placeholder {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+    font-weight: 400 !important;
+}
+
+::-moz-placeholder {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+    font-weight: 400 !important;
+}
+
+:-ms-input-placeholder {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+    font-weight: 400 !important;
+}
+
+/* Unified Module Borders & Outer Rings */
+#yieldResult {
+    border: 2px solid #38bdf8 !important;
+    box-shadow: 0 10px 25px -5px rgba(56, 189, 248, 0.25), 0 8px 10px -6px rgba(56, 189, 248, 0.2) !important;
+    outline: 1px solid #bae6fd !important;
+    border-radius: 1rem !important;
+    background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+#advisoryResult, #advisoryCard {
+    border: 2px solid #2dd4bf !important;
+    box-shadow: 0 10px 25px -5px rgba(45, 212, 191, 0.25), 0 8px 10px -6px rgba(45, 212, 191, 0.2) !important;
+    outline: 1px solid #99f6e4 !important;
+    border-radius: 1rem !important;
+    background-color: rgba(255, 255, 255, 0.95) !important;
 }

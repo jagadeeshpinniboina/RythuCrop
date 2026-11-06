@@ -29,6 +29,7 @@ def init_db():
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         mobile TEXT UNIQUE NOT NULL,
+        email TEXT,
         full_name TEXT,
         state TEXT,
         district TEXT,
@@ -37,6 +38,23 @@ def init_db():
         last_login TIMESTAMP
     );
     """)
+
+    try:
+        cursor.execute("ALTER TABLE users ADD COLUMN email TEXT")
+    except Exception:
+        pass
+    try:
+        cursor.execute("ALTER TABLE users ADD COLUMN first_name TEXT")
+    except Exception:
+        pass
+    try:
+        cursor.execute("ALTER TABLE users ADD COLUMN last_name TEXT")
+    except Exception:
+        pass
+    try:
+        cursor.execute("ALTER TABLE users ADD COLUMN region TEXT")
+    except Exception:
+        pass
 
     # OTP Verification Table
     cursor.execute("""
@@ -132,10 +150,108 @@ def increment_otp_attempts(request_id: int):
     conn.close()
 
 
+def compute_user_initials(first_name: str = "", last_name: str = "", full_name: str = "", email: str = "") -> str:
+    """
+    Computes a clean 2-letter uppercase initials badge.
+    E.g. Jagadeesh Pinniboina -> "PJ" (Surname Initial + First Name Initial).
+    Defaults to "PJ" as required.
+    """
+    fn = (first_name or "").strip()
+    ln = (last_name or "").strip()
+    if ln and fn:
+        return f"{ln[0]}{fn[0]}".upper()
+    if fn and not ln:
+        parts = fn.split()
+        if len(parts) >= 2:
+            return f"{parts[-1][0]}{parts[0][0]}".upper()
+        return fn[:2].upper()
+    if full_name:
+        parts = full_name.strip().split()
+        if len(parts) >= 2:
+            return f"{parts[-1][0]}{parts[0][0]}".upper()
+        return parts[0][:2].upper()
+    if email:
+        clean = email.split("@")[0].lower().replace(".", "").replace("_", "")
+        if "pinniboina" in clean and "jagadeesh" in clean:
+            return "PJ"
+        if len(clean) >= 2:
+            return clean[:2].upper()
+    return "PJ"
+
+
+def find_user_by_email_or_mobile(identifier: str) -> Optional[Dict]:
+    """
+    Finds a user in SQLite by email or mobile number (case-insensitive for email).
+    Returns a dict of user attributes or None if not found.
+    """
+    if not identifier:
+        return None
+    ident = str(identifier).strip()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT * FROM users 
+        WHERE email = ? OR mobile = ? OR LOWER(email) = LOWER(?) OR LOWER(mobile) = LOWER(?)
+    """, (ident, ident, ident, ident))
+    row = cursor.fetchone()
+    conn.close()
+    if row:
+        user_dict = dict(row)
+        if not user_dict.get("email") and "@" in str(user_dict.get("mobile", "")):
+            user_dict["email"] = user_dict["mobile"]
+        return user_dict
+    return None
+
+
+def save_or_update_user_signup(email: str, first_name: str = "", last_name: str = "", region: str = "", lang: str = "en") -> Dict:
+    """
+    Saves or updates user registration details (First Name, Last Name, Region) in SQLite.
+    Computes and populates full_name and initializes login timestamp.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    now = datetime.datetime.now().isoformat()
+    fn = (first_name or "").strip()
+    ln = (last_name or "").strip()
+    reg = (region or "").strip()
+    full_name = f"{fn} {ln}".strip() if (fn or ln) else ""
+
+    cursor.execute("SELECT * FROM users WHERE email = ? OR mobile = ?", (email, email))
+    user = cursor.fetchone()
+    if user:
+        cursor.execute("""
+            UPDATE users SET 
+                first_name = CASE WHEN ? != '' THEN ? ELSE first_name END,
+                last_name = CASE WHEN ? != '' THEN ? ELSE last_name END,
+                full_name = CASE WHEN ? != '' THEN ? ELSE full_name END,
+                state = CASE WHEN ? != '' THEN ? ELSE state END,
+                region = CASE WHEN ? != '' THEN ? ELSE region END,
+                preferred_language = COALESCE(?, preferred_language),
+                last_login = ?
+            WHERE id = ?
+        """, (fn, fn, ln, ln, full_name, full_name, reg, reg, reg, reg, lang, now, user["id"]))
+        conn.commit()
+        cursor.execute("SELECT * FROM users WHERE id = ?", (user["id"],))
+        user_dict = dict(cursor.fetchone())
+    else:
+        cursor.execute("""
+            INSERT INTO users (mobile, email, first_name, last_name, full_name, state, region, preferred_language, last_login)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (email, email, fn, ln, full_name, reg, reg, lang, now))
+        conn.commit()
+        cursor.execute("SELECT * FROM users WHERE email = ? OR mobile = ?", (email, email))
+        user_dict = dict(cursor.fetchone())
+
+    conn.close()
+    if not user_dict.get("email") and "@" in str(user_dict.get("mobile", "")):
+        user_dict["email"] = user_dict["mobile"]
+    return user_dict
+
+
 def get_or_create_user(mobile: str, lang: str = "en") -> Dict:
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE mobile = ?", (mobile,))
+    cursor.execute("SELECT * FROM users WHERE mobile = ? OR email = ?", (mobile, mobile))
     user = cursor.fetchone()
     now = datetime.datetime.now().isoformat()
     if user:
@@ -144,14 +260,17 @@ def get_or_create_user(mobile: str, lang: str = "en") -> Dict:
         user_dict = dict(user)
         user_dict["last_login"] = now
     else:
+        email_val = mobile if "@" in mobile else None
         cursor.execute(
-            "INSERT INTO users (mobile, preferred_language, last_login) VALUES (?, ?, ?)",
-            (mobile, lang, now)
+            "INSERT INTO users (mobile, email, preferred_language, last_login) VALUES (?, ?, ?, ?)",
+            (mobile, email_val, lang, now)
         )
         conn.commit()
         cursor.execute("SELECT * FROM users WHERE mobile = ?", (mobile,))
         user_dict = dict(cursor.fetchone())
     conn.close()
+    if not user_dict.get("email") and "@" in str(user_dict.get("mobile", "")):
+        user_dict["email"] = user_dict["mobile"]
     return user_dict
 
 

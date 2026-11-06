@@ -8,3 +8,5 @@ app_backup/
 .env
 .env.local
 
+ml/saved_models/*backup*
+*.pkl_backup*

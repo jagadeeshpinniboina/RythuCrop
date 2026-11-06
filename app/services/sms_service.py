@@ -39,10 +39,12 @@ def send_sms_otp(mobile_number, otp_code) -> Tuple[bool, str]:
     """
     Dispatches 6-digit OTP to mobile_number via Twilio WhatsApp Sandbox.
     
-    1. Sends standard plain text WhatsApp message:
-       "Your RythuCrop verification OTP is {otp_code}. Valid for 5 minutes."
-    2. Logs details and errors to backend terminal console only.
-    3. Returns success message NEVER exposing the OTP code to the UI:
+    1. Prints full verbose Twilio debug logs (Account SID, From, To).
+    2. Sends standard plain text WhatsApp message:
+       "Your RythuCrop verification OTP is: {otp_code}. Valid for 5 minutes."
+    3. Logs details and errors to backend terminal console only.
+    4. If Twilio returns an error, DOES NOT mask it as success, returns (False, clean_err).
+    5. Returns success message NEVER exposing the OTP code to the UI:
        "OTP sent successfully to your WhatsApp number (+91 XXXXXX8801)."
     """
     account_sid = os.getenv("TWILIO_ACCOUNT_SID", "").strip()
@@ -59,14 +61,20 @@ def send_sms_otp(mobile_number, otp_code) -> Tuple[bool, str]:
         print(f"[SECRET TERMINAL OTP]: {otp_code}")
         return True, success_msg
 
-    print(f"[TWILIO DISPATCH] Attempting WhatsApp OTP to +91{cleaned_mobile} with SID: {account_sid[:8]}...")
+    # Verify and format WhatsApp phone numbers strictly
+    raw_from = from_number.replace('whatsapp:', '').strip()
+    from_num = f"whatsapp:{raw_from}"
+    to_num = f"whatsapp:+91{cleaned_mobile}"
+
+    # Print full verbose Twilio debug logs
+    print(f"[TWILIO DEBUG] Account SID: {account_sid[:8]}..., From: {from_num}, To: {to_num}")
 
     try:
         client = Client(account_sid, auth_token)
         message = client.messages.create(
-            from_=f"whatsapp:{from_number}",
+            from_=f"whatsapp:{from_number.replace('whatsapp:', '')}",
             to=f"whatsapp:+91{cleaned_mobile}",
-            body=f"Your RythuCrop verification OTP is {otp_code}. Valid for 5 minutes."
+            body=f"Your RythuCrop verification OTP is: {otp_code}. Valid for 5 minutes."
         )
         print(f"[TWILIO SUCCESS] Message SID: {message.sid}")
         print(f"[SECRET TERMINAL OTP]: {otp_code}")
@@ -77,8 +85,8 @@ def send_sms_otp(mobile_number, otp_code) -> Tuple[bool, str]:
         print(f"[TWILIO ERROR DETAILS]: Code={error_code}, Msg={clean_err}")
         # Only log the OTP in the private backend terminal console for debugging
         print(f"[SECRET TERMINAL OTP]: {otp_code}")
-        # Auto-fallback to letting user advance without exposing OTP in UI
-        return True, success_msg
+        # DO NOT mask Twilio errors as generic success
+        return False, clean_err
 
 
 def send_otp_sms(mobile: str, otp: str, masked_mobile: str = "") -> Tuple[bool, str]:
