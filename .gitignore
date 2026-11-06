@@ -1,12 +1,35 @@
-venv/
-*.pyc
+# Byte-compiled / optimized / DLL files
 __pycache__/
-Crop-Yield-Prediction-Backup/
-app_backup/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Caches and testing
+.pytest_cache/
+.coverage
+htmlcov/
 .system_generated/
-*.db
+
+# Environments and secrets
+venv/
+env/
+ENV/
 .env
 .env.local
+.env.*.local
 
+# Database files
+*.db
+*.sqlite3
+
+# Backups and temporary directories
+Crop-Yield-Prediction-Backup/
+app_backup/
 ml/saved_models/*backup*
 *.pkl_backup*
+
+# Editor directories and OS artifacts
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
